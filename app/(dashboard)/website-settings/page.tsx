@@ -1,6 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { axiosClient } from "@/config/axiosClient";
+import { API_ENDPOINTS } from "@/config/endpoint";
+import { useAuthStore } from "@/store/useStore";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"
+import toast from "react-hot-toast";
 import { 
   FiSettings, 
   FiMail, 
@@ -18,7 +23,9 @@ import {
   FiImage,
   FiShare2,
   FiShield,
-  FiUpload
+  FiUpload,
+  FiPlusCircle,
+  FiXCircle
 } from "react-icons/fi";
 
 type TabId = "general" | "newsletter" | "navbar" | "footer" | "seller" | "templates";
@@ -39,7 +46,82 @@ const tabs: Tab[] = [
 ];
 
 export default function WebsiteSettingsPage() {
+
+  const {user} = useAuthStore()
+  
   const [activeTab, setActiveTab] = useState<TabId>("general");
+  const [isDomainAvailable, setIsDomainAvailable] = useState<boolean>(false);
+  const [domain, setDomain] = useState("");
+  const [readyToDeploy, setReadyToDeploy] = useState(false)
+  const [isWebsiteLive, setIsWebsiteLive] = useState(false);
+  const router = useRouter();
+  
+  const checkDomain = async(slug:string) => {
+
+    try {
+      const response = await axiosClient.get(API_ENDPOINTS.GET_DOMAIN, {
+        params: {
+          domain:slug
+        }
+      });
+      console.log(response?.data)
+      console.log("pehle",response?.data?.success)
+
+      setIsDomainAvailable(response.data.success);
+
+    } catch (error:any) {
+      console.log(error.response?.data);
+      setIsDomainAvailable(false);
+    }
+  }
+
+  const deployWebsite = async () => {
+   
+
+    try {
+      const response = await axiosClient.post(API_ENDPOINTS.DEPLOY_WEBSITE, {
+        slug:domain,
+        userId:user?.userId,
+      });
+      console.log(response?.data)
+      toast.success("your website has been deployed successfully.")
+      setReadyToDeploy(false)
+      checkDomain(domain);
+      isTenantLive()
+    } catch (error:any) {
+      console.log(error.response.data);
+    }
+  }
+
+  const isTenantLive = async () => {
+    if(!user?.userId){
+      router.push('/login')
+      return 
+    }
+    
+    try {
+       const res = await axiosClient.get(API_ENDPOINTS.GET_TENANT_DETAIL, {
+      params: {
+        sellerId:user?.userId,
+      }
+       })
+      console.log(res?.data?.data);
+      if(res?.data?.success){
+          setIsWebsiteLive(res.data.data?.isWebsiteLive)
+          setDomain(res?.data.data?.slug)
+      }
+    } catch (error:any) {
+      console.log(error.response.data);
+      
+    }
+   
+  }
+
+
+  // on load always check is the the tenat already exists with the domain ?
+  useEffect(() => {
+   isTenantLive()
+  },[user?.userId])
 
   return (
     <div className="w-full pb-10">
@@ -103,7 +185,92 @@ export default function WebsiteSettingsPage() {
                   />
                 </div>
 
-                <div>
+
+                {
+                  !isWebsiteLive && (
+                      <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
+                    Website Domain <span className="text-red-500">*</span>
+                    <span className="w-3.5 h-3.5 rounded-full border border-gray-400 text-gray-400 flex items-center justify-center text-[9px] font-bold">i</span>
+                  </label>
+                  <div className="flex items-center justify-start">
+                    <input 
+                      type="text" 
+                      placeholder="Enter Domain"
+                      value={domain}
+                      className="w-full px-4 py-2.5 rounded-lg border-l border-gray-200 bg-gray-50 text-gray-500 focus:outline-none text-sm pr-10"
+                      onChange={(e) => {
+                        setDomain(e.target.value);
+                        checkDomain(e.target.value)
+                      }}
+                    />
+                    <span className=" px-4 py-2.5 rounded-lg border-r border-gray-200 bg-gray-50 text-gray-500 focus:outline-none text-sm pr-10 bg-teal-50 font-bold">.amancodes.in</span>
+                    <FiCheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                  </div>
+                  <div className="flex flex-col justify-between gap-2 items-start mt-2">
+                    <div className="w-auto">
+                      {
+                        domain?.length === 0 && <p className="text-xs text-gray-500 font-medium flex items-center justify-center">Enter Domain Name</p>
+                      }
+                    {
+                      domain?.length > 0 && (
+                        isDomainAvailable ? (
+                          <p className="text-xs text-teal-500 font-medium flex items-center justify-center">  <FiCheckCircle className="w-3 h-3 mr-1" />Domain is available -- ( { domain+ ".amancodes.in"} )</p>
+                        ) : (
+                          <p className="text-xs text-red-500 font-medium flex items-center justify-center"> <FiXCircle className="w-3 h-3 mr-1" />Domain is not available -- ( { domain+ ".amancodes.in"} )</p>
+                        )
+                      )
+                      }
+                    </div>
+
+                    {
+                      isDomainAvailable && domain?.length > 0 && (
+                         <button className="px-3 py-3 border border-gray-200 text-gray-700 rounded-md text-xs font-semibold hover:bg-teal-100 flex items-center gap-1.5 cursor-pointer bg-teal-50 text-teal-500 " onClick={()=> setReadyToDeploy(true)}>
+                      <FiPlusCircle className="w-3 h-3 font-bold" />
+                      Deploy Website
+                    </button>
+                      )
+                    }
+                   
+                  </div>
+                </div>
+                  )
+               }
+                {
+                  readyToDeploy && (
+                   <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40">
+          <div className="w-[90%] max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Confirm Deployment
+            </h2>
+
+            <p className="mt-2 text-sm text-gray-600">
+              Are you sure you want to deploy your website?
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setReadyToDeploy(false)}
+                className="rounded-lg border border-gray-300 cursor-pointer px-4 py-2 text-sm font-medium transition hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={deployWebsite}
+                className="rounded-lg bg-teal-500 cursor-pointer px-4 py-2 text-sm font-medium text-white transition hover:bg-teal-600"
+              >
+                Deploy
+              </button>
+            </div>
+          </div>
+        </div>
+                  )
+                }
+
+                {
+                  isWebsiteLive && (
+                     <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
                     Website Domain <span className="text-red-500">*</span>
                     <span className="w-3.5 h-3.5 rounded-full border border-gray-400 text-gray-400 flex items-center justify-center text-[9px] font-bold">i</span>
@@ -111,7 +278,7 @@ export default function WebsiteSettingsPage() {
                   <div className="relative">
                     <input 
                       type="text" 
-                      defaultValue="https://elevationestatesofficial4.covesagent.com"
+                      defaultValue={"https://"+domain+".amancodes.in"}
                       readOnly
                       className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 focus:outline-none text-sm pr-10"
                     />
@@ -124,20 +291,12 @@ export default function WebsiteSettingsPage() {
                       Request Change
                     </button>
                   </div>
-                </div>
+                </div> 
+                  )
+                }
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Website Live Date
-                  </label>
-                  <input 
-                    type="text" 
-                    defaultValue="31 03 2026"
-                    readOnly
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white focus:outline-none text-sm text-gray-700"
-                  />
-                  <p className="mt-2 text-xs text-gray-400">Your website is already live</p>
-                </div>
+
+               
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -505,3 +664,7 @@ export default function WebsiteSettingsPage() {
     </div>
   );
 }
+
+
+
+
