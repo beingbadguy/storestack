@@ -47,7 +47,7 @@ const tabs: Tab[] = [
 
 export default function WebsiteSettingsPage() {
 
-  const {user} = useAuthStore()
+  const {user,setSellerDomain} = useAuthStore()
   
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [isDomainAvailable, setIsDomainAvailable] = useState<boolean>(false);
@@ -107,8 +107,11 @@ export default function WebsiteSettingsPage() {
        })
       console.log(res?.data?.data);
       if(res?.data?.success){
-          setIsWebsiteLive(res.data.data?.isWebsiteLive)
-          setDomain(res?.data.data?.slug)
+        setIsWebsiteLive(res.data.data?.isWebsiteLive)
+        setDomain(res?.data.data?.slug)
+        if (res?.data?.data?.isWebsiteLive) {
+         setSellerDomain(res?.data.data?.slug) 
+        }
       }
     } catch (error:any) {
       console.log(error.response.data);

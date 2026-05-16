@@ -17,6 +17,8 @@ export type AuthState = {
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   logout: () => void;
+  setSellerDomain: (domain: string | null) => void;
+  sellerDomain: string | null;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -28,6 +30,8 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user: User | null) => set({ user, isAuthenticated: !!user }),
       setToken: (token: string | null) => set({ token }),
       logout: () => set({ user: null, token: null, isAuthenticated: false }),
+      setSellerDomain: (domain: string | null) => set({ sellerDomain: domain }),
+      sellerDomain: null,
     }),
     {
       name: "auth-storage",
