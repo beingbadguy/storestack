@@ -1,16 +1,61 @@
+import CenteredNavbar from "@/components/navigation_bars/CenteredNavbar";
+import DarkNavbar from "@/components/navigation_bars/DarkNavbar";
+import DoubleNavbar from "@/components/navigation_bars/DoubleNavbar";
+import FloatingNavbar from "@/components/navigation_bars/FloatingNavbar";
+import MinimalNavbar from "@/components/navigation_bars/MinimalNavbar";
+
+import MultiColumnFooter from "@/components/footers/MultiColumnFooter";
+import MinimalContactFooter from "@/components/footers/MinimalContactFooter";
+import CenteredFooter from "@/components/footers/CenteredFooter";
+import NewsletterFooter from "@/components/footers/NewsletterFooter";
+
+import { connectToDatabase } from "@/config/databaseConnection";
+import Tenant from "@/models/tenant.model";
+import WebSettings from "@/models/webSettings.model";
+
 export default async function DomainHomePage({ params }: { params: Promise<{ domain: string }> }) {
     const { domain } = await params;
+
+    await connectToDatabase();
+    const tenant = await Tenant.findOne({ slug: domain });
+    let settings = null;
+    
+    if (tenant) {
+        settings = await WebSettings.findOne({ tenantId: tenant._id });
+        if (!settings) {
+            settings = await WebSettings.create({ tenantId: tenant._id });
+        }
+    }
+
+    const navbarLayout = settings?.navbarLayout || "minimal";
+    const footerLayout = settings?.footerLayout || "multicolumn";
+    const brandName = settings?.websiteName || domain;
+    const theme = settings?.theme || "teal-white";
+
     return (
-        <div className="flex min-h-screen flex-col items-center p-16 bg-gray-50">
-            <h1 className="text-6xl font-extrabold tracking-tight text-gray-900 mb-6">Welcome to {domain}</h1>
-            <p className="text-2xl text-gray-600 max-w-2xl text-center leading-relaxed">
-                This is the custom frontend for your amazing website. It is served dynamically based on your registered domain slug.
-            </p>
-            <div className="mt-10 flex gap-4">
-                <a href={`/login`} className="rounded-lg bg-black px-8 py-3 font-semibold text-white transition hover:bg-gray-800">
-                    Go to Login
-                </a>
+        <div className={`flex flex-col min-h-screen bg-gray-50 theme-${theme}`}>
+            <div className="flex-grow">
+                {navbarLayout === "minimal" && <MinimalNavbar brandName={brandName} />}
+                {navbarLayout === "centered" && <CenteredNavbar brandName={brandName} />}
+                {navbarLayout === "floating" && <FloatingNavbar brandName={brandName} />}
+                {navbarLayout === "dark" && <DarkNavbar brandName={brandName} />}
+                {navbarLayout === "double" && <DoubleNavbar brandName={brandName} />}
+                
+                {/* Dynamic Content Area */}
+                <div className="flex flex-col items-center justify-center py-32 text-center px-4">
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                        {settings?.websiteTitle || "Experience Exceptional Shopping"}
+                    </h1>
+                    <p className="text-gray-500 max-w-2xl text-lg">
+                        {settings?.siteDescription || "Browse premium products and make confident shopping decisions."}
+                    </p>
+                </div>
             </div>
+
+            {footerLayout === "multicolumn" && <MultiColumnFooter brandName={brandName} />}
+            {footerLayout === "minimalcontact" && <MinimalContactFooter brandName={brandName} />}
+            {footerLayout === "centered" && <CenteredFooter brandName={brandName} />}
+            {footerLayout === "newsletter" && <NewsletterFooter brandName={brandName} />}
         </div>
     );
 }

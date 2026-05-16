@@ -28,7 +28,7 @@ import {
   FiXCircle
 } from "react-icons/fi";
 
-type TabId = "general" | "newsletter" | "navbar" | "footer" | "seller" | "templates";
+type TabId = "general" | "newsletter" | "navbar" | "footer" | "seller"  | "theme";
 
 interface Tab {
   id: TabId;
@@ -42,7 +42,8 @@ const tabs: Tab[] = [
   { id: "navbar", label: "Navbar", icon: <FiNavigation className="w-4 h-4 mr-2" /> },
   { id: "footer", label: "Footer", icon: <FiLayout className="w-4 h-4 mr-2" /> },
   { id: "seller", label: "Seller", icon: <FiShoppingCart className="w-4 h-4 mr-2" /> },
-  { id: "templates", label: "Templates", icon: <FiLayers className="w-4 h-4 mr-2" /> },
+  { id: "theme", label: "Theme", icon: <FiImage className="w-4 h-4 mr-2" /> },
+  
 ];
 
 export default function WebsiteSettingsPage() {
@@ -54,6 +55,7 @@ export default function WebsiteSettingsPage() {
   const [domain, setDomain] = useState("");
   const [readyToDeploy, setReadyToDeploy] = useState(false)
   const [isWebsiteLive, setIsWebsiteLive] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState("teal-white");
   const router = useRouter();
   
   const checkDomain = async(slug:string) => {
@@ -179,7 +181,7 @@ export default function WebsiteSettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="col-span-1 md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Website Name <span className="text-red-500">*</span>
+                    Brand Name <span className="text-red-500">*</span>
                   </label>
                   <input 
                     type="text" 
@@ -303,7 +305,7 @@ export default function WebsiteSettingsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Website Title (Banner Title)
+                    Website Title
                   </label>
                   <input 
                     type="text" 
@@ -312,36 +314,6 @@ export default function WebsiteSettingsPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Site Description (Banner Subtitle)
-                  </label>
-                  <input 
-                    type="text" 
-                    defaultValue="Browse premium homes, compare options, and make confident real estate decisions."
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors text-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Featured Listings Count
-                  </label>
-                  <input 
-                    type="number" 
-                    defaultValue="4"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors text-sm"
-                  />
-                </div>
-
-                <div className="flex items-center mt-6">
-                  <input 
-                    type="checkbox" 
-                    defaultChecked 
-                    className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500" 
-                  />
-                  <label className="ml-2 text-sm text-gray-700">Show Searchbar on Website</label>
-                </div>
               </div>
             </div>
 
@@ -637,25 +609,78 @@ export default function WebsiteSettingsPage() {
                   ></textarea>
                 </div>
 
-                <div className="col-span-1 md:col-span-2 border-t border-gray-100 pt-6 mt-2">
-                  <div className="flex items-center mb-4">
-                    <input type="checkbox" defaultChecked className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500" />
-                    <label className="ml-2 text-sm font-medium text-gray-700">Show Copyright in Footer</label>
-                  </div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Copyright Information Link/Text</label>
-                  <input 
-                    type="text" 
-                    defaultValue="https://agentsweb.s3.us-east-2.amazonaws.com/public/OTIx/websitesettings/content/copyright.html?v=1775128294940" 
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm" 
-                  />
-                </div>
+               
               </div>
             </div>
           </div>
         )}
+        {
+          activeTab === "navbar" && (
+            <div className="p-4 min-h-[400px] flex items-start justify-start flex-col">
+              {/* <div className="text-center text-gray-500">
+                <p className="text-lg font-medium">Navbar Settings</p>
+                <p className="text-sm mt-2">Content for this section is coming soon.</p>
+              </div> */}
+              <p className="font-semibold text-lg">Headers</p>
+              <div>
+
+              </div>
+              <p className="font-semibold text-lg">Navbars</p>
+              <div>
+                
+              </div>
+    
+            </div>
+          )
+        }
 
         {/* Other Tabs content placeholders */}
-        {activeTab !== "general" && (
+        {activeTab === "theme" && (
+          <div className="p-8">
+            <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-100">
+              <FiImage className="w-5 h-5" />
+              <h2 className="text-base font-semibold">Theme & Colors</h2>
+            </div>
+            
+            <p className="text-sm text-gray-500 mb-6">Select a primary color combination for your website's buttons, accents, and backgrounds.</p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+              {[
+                { id: "teal-white", name: "Teal & White", primary: "bg-teal-600", bg: "bg-white", border: "border-gray-200" },
+                { id: "black-white", name: "Black & White", primary: "bg-black", bg: "bg-white", border: "border-gray-200" },
+                { id: "yellow-white", name: "Yellow & White", primary: "bg-yellow-400", bg: "bg-white", border: "border-gray-200" },
+                { id: "indigo-slate", name: "Indigo & Slate", primary: "bg-indigo-600", bg: "bg-slate-50", border: "border-slate-200" },
+                { id: "rose-stone", name: "Rose & Stone", primary: "bg-rose-600", bg: "bg-stone-50", border: "border-stone-200" },
+                { id: "emerald-gray", name: "Emerald & Gray", primary: "bg-emerald-600", bg: "bg-gray-50", border: "border-gray-200" },
+              ].map((theme) => (
+                <div 
+                  key={theme.id}
+                  onClick={() => setSelectedTheme(theme.id)}
+                  className={`cursor-pointer rounded-xl border-2 transition-all p-3 flex flex-col items-center gap-3 relative ${selectedTheme === theme.id ? 'border-teal-500 shadow-md scale-105' : 'border-gray-100 hover:border-gray-300 hover:shadow-sm'}`}
+                >
+                  {/* Color Preview Box */}
+                  <div className={`w-full aspect-video rounded-lg border ${theme.border} ${theme.bg} overflow-hidden flex flex-col`}>
+                    <div className="h-1/3 bg-gray-100 border-b border-gray-200 flex flex-row items-center px-2 gap-1">
+                       <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                       <div className="w-6 h-1 rounded-full bg-gray-300"></div>
+                    </div>
+                    <div className="flex-1 flex items-center justify-center p-2">
+                       <div className={`w-full h-4 rounded ${theme.primary}`}></div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-semibold text-gray-700">{theme.name}</span>
+                  {selectedTheme === theme.id && (
+                    <div className="absolute -top-2 -right-2 bg-teal-500 text-white rounded-full p-1 shadow-sm">
+                      <FiCheckCircle className="w-3 h-3" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab !== "general" && activeTab !== "navbar" && activeTab !== "theme" && (
           <div className="p-8 min-h-[400px] flex items-center justify-center">
             <div className="text-center text-gray-500">
               <p className="text-lg font-medium">{tabs.find(t => t.id === activeTab)?.label} Settings</p>
