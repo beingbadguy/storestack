@@ -8,10 +8,13 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { BiLogOut, BiUser } from "react-icons/bi";
+import { FaExternalLinkAlt } from "react-icons/fa";
 import { FiMenu } from "react-icons/fi";
+import { LiaLinkSolid } from "react-icons/lia";
+import { PiStorefront } from "react-icons/pi";
 
 const Header = () => {
-  const { user, setUser, sellerDomain } = useAuthStore();
+  const { user, setUser, sellerDomain , setSellerDomain} = useAuthStore();
   const { toggleSidebar } = useUiStore();
   const router = useRouter();
   const path = usePathname();
@@ -32,6 +35,8 @@ const Header = () => {
         console.log(response?.data);
         toast.success(response.data.message || "logout successful!");
         setUser(null);
+        setSellerDomain(null);
+        
         router.push("/login");
       }
 
@@ -75,12 +80,20 @@ const Header = () => {
 
         <div className="flex items-center gap-4">
           {liveLink && (
-            <button 
-              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium transition hover:bg-gray-100"
+            <div>
+              <PiStorefront
+                onClick={() => window.open(liveLink, '_blank')}
+                className=" text-xl font-medium transition hover:bg-gray-100 cursor-pointer  block md:hidden" />
+<button 
+              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium transition hover:bg-gray-100 cursor-pointer  hidden md:block"
               onClick={() => window.open(liveLink, '_blank')}
             >
-              View Live Website
+              Visit Website 
             </button>
+
+
+            </div>
+            
           )}
           <div className="flex items-center gap-2">
             <button className="text-sm font-medium hidden md:block">
@@ -91,7 +104,7 @@ const Header = () => {
 
           <button
             onClick={() => setLogoutModal(true)}
-            className="rounded-md p-1 transition hover:bg-red-50"
+            className="rounded-md p-1 transition hover:bg-red-50 "
           >
             <BiLogOut className="cursor-pointer text-2xl hover:text-red-500" />
           </button>

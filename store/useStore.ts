@@ -19,6 +19,8 @@ export type AuthState = {
   logout: () => void;
   setSellerDomain: (domain: string | null) => void;
   sellerDomain: string | null;
+  webSettings: any | null;
+  setWebSettings: (webSettings: any | null) => void;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -32,6 +34,8 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ user: null, token: null, isAuthenticated: false }),
       setSellerDomain: (domain: string | null) => set({ sellerDomain: domain }),
       sellerDomain: null,
+      setWebSettings: (webSettings: any | null) => set({ webSettings }),
+      webSettings: null,
     }),
     {
       name: "auth-storage",

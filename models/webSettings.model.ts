@@ -62,7 +62,16 @@ const webSettingsSchema = new mongoose.Schema({
     showCopyright: { type: Boolean, default: true },
     copyrightLink: { type: String, default: "" },
 
+    enableNewsletter: { type: Boolean, default: false },
+    newsletterText: { type: String, default: "Receive new updates delivered straight to your inbox." },
+    newsletterTitle: { type: String, default: "Sign Up For Our Newsletter" },
+
+
 }, { timestamps: true });
+
+// if (process.env.NODE_ENV === "development") {
+//     delete mongoose.models.WebSettings;
+// }
 
 const WebSettings = mongoose.models.WebSettings || mongoose.model("WebSettings", webSettingsSchema);
 

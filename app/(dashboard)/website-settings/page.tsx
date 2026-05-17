@@ -36,6 +36,7 @@ import {
   FiPlusCircle,
   FiXCircle
 } from "react-icons/fi";
+import { BiCross, BiX } from "react-icons/bi";
 
 type TabId = "general" | "newsletter" | "navbar" | "footer" | "seller"  | "theme";
 
@@ -66,6 +67,10 @@ export default function WebsiteSettingsPage() {
   const [isWebsiteLive, setIsWebsiteLive] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState("teal-white");
   const [previewModal, setPreviewModal] = useState<{ type: "navbar" | "footer" | null, layout: string }>({ type: null, layout: "" });
+  const [cookieError, setCookieError] = useState("");
+  const [newsletterEnabled, setNewsletterEnabled] = useState(false);
+  // const [newsletterText, setNewsletterText] = useState("");
+
   const router = useRouter();
 
   const [settings, setSettings] = useState({
@@ -98,6 +103,9 @@ export default function WebsiteSettingsPage() {
     enableCookieConsent: true,
     cookiePosition: "bottom",
     cookieText: "We use cookies to improve your experience, analyze site traffic, and support personalized advertising. By continuing to browse, you consent to the use of essential, analytics, and marketing cookies in accordance with our Privacy Policy.",
+    enableNewsletter: false,
+    newsletterTitle: "",
+    newsletterText: "",
     theme: "teal-white",
     navbarLayout: "minimal",
     footerLayout: "multicolumn"
@@ -138,6 +146,11 @@ export default function WebsiteSettingsPage() {
             tenantId: tId,
           }
         })
+
+        if (!settings?.cookieText) {
+          setCookieError("Please add cookie text.")
+        }
+
         if (response?.data?.data) {
           setSettings(prev => ({
             ...prev,
@@ -147,12 +160,21 @@ export default function WebsiteSettingsPage() {
               ...(response.data.data.socialLinks || {})
             }
           }));
+
+          console.log("response.data.data?.enablenewsletter", response.data.data?.enableNewsletter)
+          if(response.data.data?.enableNewsletter){
+            setNewsletterEnabled(true)
+          }
+          else {
+            setNewsletterEnabled(false)
+          }
           if (response.data.data.theme) {
             setSelectedTheme(response.data.data.theme);
           }
         }
       } catch (error) {
         console.log(error);
+        setNewsletterEnabled(false)
       }
   }
 
@@ -189,10 +211,16 @@ export default function WebsiteSettingsPage() {
       toast.error("Please deploy a website domain first.");
       return;
     }
+    if (!settings?.cookieText) {
+      setCookieError("Please add cookie text.");
+      return;
+    }
+    setCookieError("")
     const updatePromise = axiosClient.post(API_ENDPOINTS.UPDATE_WEBSETTINGS, {
       tenantId: tenantId,
       sellerId: user?.userId,
       ...settings,
+      
       theme: selectedTheme
     });
 
@@ -268,7 +296,7 @@ export default function WebsiteSettingsPage() {
           <div className="p-8 space-y-10">
             {/* Basic Information */}
             <div>
-              <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-100">
+              <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-200">
                 <FiGlobe className="w-5 h-5" />
                 <h2 className="text-base font-semibold">Basic Information</h2>
               </div>
@@ -411,14 +439,14 @@ export default function WebsiteSettingsPage() {
             </div>
 
             {/* Media & Branding */}
-            <div>
-              <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-100">
+            {/* <div> */}
+              {/* <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-200">
                 <FiImage className="w-5 h-5" />
                 <h2 className="text-base font-semibold">Media & Branding</h2>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                <div>
+               */}
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"> */}
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Site Favicon</label>
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
@@ -428,8 +456,8 @@ export default function WebsiteSettingsPage() {
                       <FiUpload className="w-4 h-4" /> Upload
                     </button>
                   </div>
-                </div>
-
+                </div> */}
+{/* 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Footer Logo</label>
                   <div className="flex items-center gap-4">
@@ -444,9 +472,9 @@ export default function WebsiteSettingsPage() {
                       <FiUpload className="w-4 h-4" /> Upload
                     </button>
                   </div>
-                </div>
+                </div> */}
 
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Site Logo Light</label>
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-32 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
@@ -468,9 +496,9 @@ export default function WebsiteSettingsPage() {
                       <FiUpload className="w-4 h-4" /> Upload
                     </button>
                   </div>
-                </div>
+                </div> */}
 
-                <div className="col-span-1 md:col-span-2 border-t border-gray-100 pt-6 mt-2 flex flex-col gap-6">
+                {/* <div className="col-span-1 md:col-span-2 border-t border-gray-100 pt-6 mt-2 flex flex-col gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Banner Type</label>
                     <select 
@@ -491,16 +519,29 @@ export default function WebsiteSettingsPage() {
                       <span className="ml-3 text-sm font-medium text-gray-700">Show Copyright in Footer</span>
                     </label> 
                   </div>
-                </div>
-              </div>
-            </div>
+                </div> */}
+              {/* </div>
+            </div> */}
 
             {/* Legal & Compliance */}
             <div>
-              <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-100">
+              <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-200">
                 <FiShield className="w-5 h-5" />
                 <h2 className="text-base font-semibold">Legal & Cookie Compliance</h2>
               </div>
+              <div className="flex justify-between items-center my-3 ">
+                  <label className="text-sm font-medium text-gray-700">Enable Cookie Consent Banner</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                     
+                   <input 
+                        type="checkbox" 
+                        checked={settings.enableCookieConsent}
+                        onChange={(e) => setSettings({...settings, enableCookieConsent: e.target.checked})}
+                        className="sr-only peer" 
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
+                    </label>
+                  </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="col-span-1 md:col-span-2 flex flex-col md:flex-row gap-6 md:items-end">
                   <div className="flex-1 md:max-w-md">
@@ -516,18 +557,7 @@ export default function WebsiteSettingsPage() {
                     </select>
                   </div>
 
-                  <div className="flex items-center mb-2">
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={settings.enableCookieConsent}
-                        onChange={(e) => setSettings({...settings, enableCookieConsent: e.target.checked})}
-                        className="sr-only peer" 
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
-                      <span className="ml-3 text-sm font-medium text-gray-700">Enable Cookie Consent Banner</span>
-                    </label>
-                  </div>
+                  
                 </div>
 
                 <div className="col-span-1 md:col-span-2">
@@ -538,13 +568,166 @@ export default function WebsiteSettingsPage() {
                     onChange={(e) => setSettings({...settings, cookieText: e.target.value})}
                     className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm resize-none"
                   ></textarea>
+                      {
+                  cookieError && (
+                    <p className="text-red-500 text-sm">{cookieError}</p>
+                  )
+                }
                 </div>
+            
 
                
               </div>
             </div>
           </div>
         )}
+
+        {/* newsletter tab  */}
+        {
+          activeTab === "newsletter" && (
+            <div className="p-4">
+              <div className="flex items-center justify-between">
+                <p>Enable Newsletter</p>
+                 <label className="relative inline-flex items-center cursor-pointer">
+                     
+                   <input 
+                        type="checkbox" 
+                        checked={settings.enableNewsletter}
+                        onChange={(e) => setSettings({...settings, enableNewsletter: e.target.checked})}
+                        className="sr-only peer" 
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
+                    </label>
+              </div> 
+              {
+                newsletterEnabled && settings.enableNewsletter && (
+                  <div className="mt-4 flex w-full flex-col lg:flex-row">
+
+                    <div className="w-full  ">
+
+                    {/* newsletter title  */}
+                     <label htmlFor="newsletterTitle" className="block text-sm font-medium text-gray-700 mb-2">Newsletter Title</label>
+                    <input 
+                      id="newsletterTitle" 
+                      value={settings.newsletterTitle}
+                      onChange={(e) => setSettings({...settings, newsletterTitle: e.target.value})}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm "
+                    />
+                    {/* newsletter text  */}
+                    <label htmlFor="newsletterText" className="block text-sm font-medium text-gray-700 mb-2 my-2">Newsletter Text</label>
+                    <textarea 
+                      id="newsletterText" 
+                      rows={3} 
+                      value={settings.newsletterText}
+                      onChange={(e) => setSettings({...settings, newsletterText: e.target.value})}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm resize-none"
+                    ></textarea>
+                    {/* newsletter background  */}
+                     {/* <label htmlFor="newsletterBgImage" className="block text-sm font-medium text-gray-700 mb-2">Newsletter Background</label>
+                    <textarea 
+                      id="newsletterBgImage" 
+                      rows={3} 
+                      value={settings.newsletterBgImage}
+                      onChange={(e) => setSettings({...settings, newsletterBgImage: e.target.value})}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm resize-none"
+                    ></textarea> */}
+
+                    </div>
+
+
+
+                    <div className=" flex items-center justify-center p-4">
+            <div className="relative w-full max-w-lg overflow-hidden rounded-[32px] bg-white shadow-2xl">
+
+                {/* Close Button */}
+                <button
+                    // onClick={() => setOpen(false)}
+                    className="absolute right-5 top-5 z-20 rounded-full bg-white/90 p-2 text-gray-500 transition hover:bg-gray-100"
+                >
+                    <BiX size={18} />
+                </button>
+
+                {/* Top Background */}
+                <div className="relative h-[280px] overflow-hidden bg-gradient-to-b from-teal-400 via-teal-300 tealto-orange-100">
+
+                    {/* Curved Lines */}
+                    <div className="absolute inset-0 opacity-30">
+                        <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full border border-white/60"></div>
+                        <div className="absolute left-1/2 top-8 h-[450px] w-[450px] -translate-x-1/2 rounded-full border border-white/50"></div>
+                        <div className="absolute left-1/2 top-16 h-[400px] w-[400px] -translate-x-1/2 rounded-full border border-white/40"></div>
+                    </div>
+
+                    {/* Envelope */}
+                    <div className="absolute bottom-[-30px] left-1/2 flex -translate-x-1/2 justify-center">
+                        <div className="relative h-[180px] w-[240px]">
+
+                            {/* Letter */}
+                            <div className="absolute left-1/2 top-0 h-[110px] w-[170px] -translate-x-1/2 rounded-md bg-gray-100 shadow-md">
+                                <div className="mt-5 space-y-2 px-4">
+                                    <div className="h-2 rounded bg-gray-300"></div>
+                                    <div className="h-2 rounded bg-gray-200"></div>
+                                    <div className="h-2 w-3/4 rounded bg-gray-200"></div>
+                                </div>
+                            </div>
+
+                            {/* Envelope Body */}
+                            <div className="absolute bottom-0 h-[140px] w-full rounded-b-2xl bg-white shadow-xl"></div>
+
+                            {/* Left Fold */}
+                            <div className="absolute bottom-0 left-0 h-0 w-0 border-b-[70px] border-l-[120px] border-b-gray-100 border-l-transparent"></div>
+
+                            {/* Right Fold */}
+                            <div className="absolute bottom-0 right-0 h-0 w-0 border-b-[70px] border-r-[120px] border-b-gray-100 border-r-transparent"></div>
+
+                            {/* Top Fold */}
+                            <div className="absolute top-[40px] h-0 w-0 border-l-[120px] border-r-[120px] border-t-[80px] border-l-transparent border-r-transparent border-t-white"></div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="px-8 pb-10 pt-20 text-center">
+                    <h2 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">
+                      {settings.newsletterTitle || "Sign Up For Our Newsletter"}
+                    </h2>
+
+                    <p className="mt-5 text-lg leading-relaxed text-gray-500">
+                      {settings.newsletterText || "Receive new updates delivered to your inbox"}
+                       
+                    </p>
+
+                    {/* Input */}
+                    <div className="mt-8">
+                        <input
+                            type="email"
+                            placeholder="Your Email"
+                            className="h-14 w-full rounded-2xl border border-gray-200 px-5 text-base outline-none transition focus:border-teal-400"
+                        />
+                    </div>
+
+                    {/* Button */}
+                    <button className="mt-5 h-14 w-full rounded-2xl bg-teal-500 text-lg font-medium text-white shadow-lg transition hover:bg-teal-600">
+                        Sign up
+                    </button>
+
+                    {/* Footer Text */}
+                    <p className="mt-6 text-sm text-gray-400">
+                        Don’t worry, we won’t send you spam or sell your data.
+                    </p>
+                </div>
+            </div>
+                     </div>
+                  </div>
+
+
+                  
+
+                )
+              }
+
+            </div>
+          )
+        }
         
         {
           activeTab === "navbar" && (

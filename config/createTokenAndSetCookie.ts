@@ -11,10 +11,6 @@ export async function createTokenAndSetCookie(
     .setExpirationTime("2h")
     .sign(secretKey);
 
-  console.log(
-    "==THIS IS THE RESPONSE IN THE CREATE TOKEN FUNCTION==",
-    response,
-  );
   response.cookies.set("storestack", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

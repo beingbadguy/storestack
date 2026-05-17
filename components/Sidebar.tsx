@@ -125,6 +125,11 @@ const Sidebar = () => {
           icon: <MdDisplaySettings />,
           link: "/website-settings",
         },
+         {
+          name: "Settings",
+          icon: <FiSettings />,
+          link: "/settings",
+        },
       ],
     },
   ];
@@ -132,7 +137,7 @@ const Sidebar = () => {
   return (
     <aside className="h-screen w-full bg-white border-r border-gray-200 overflow-y-auto overscroll-contain flex flex-col">
       {/* LOGO & CLOSE BUTTON */}
-      <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4.5">
+      <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4.5 mt-20 lg:mt-0">
         <div className="flex items-center gap-2">
           <Image
             src="https://logobook.com/wp-content/uploads/2016/10/Real_Typographers_logo.svg"

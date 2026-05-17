@@ -13,6 +13,8 @@ import CookieConsent from "@/components/CookieConsent";
 import { connectToDatabase } from "@/config/databaseConnection";
 import Tenant from "@/models/tenant.model";
 import WebSettings from "@/models/webSettings.model";
+import NewsletterModal from "@/components/NewsletterModal";
+import Hydrator from "@/components/Hydator";
 
 export default async function DomainHomePage({ params }: { params: Promise<{ domain: string }> }) {
     const { domain } = await params;
@@ -33,13 +35,14 @@ export default async function DomainHomePage({ params }: { params: Promise<{ dom
     const navbarLayout = settings?.navbarLayout || "minimal";
     const footerLayout = settings?.footerLayout || "multicolumn";
     let brandName = settings?.brandName || domain;
-    if (brandName.length > 10) {
-        brandName = brandName.substring(0, 10);
+    if (brandName.length > 14) {
+        brandName = brandName.substring(0, 14);
     }
     const theme = settings?.theme || "teal-white";
 
     return (
         <div className={`flex flex-col min-h-screen bg-gray-50 theme-${theme}`}>
+             <Hydrator settings={settings} />
             <div className="flex-grow">
                 {navbarLayout === "minimal" && <MinimalNavbar brandName={brandName} />}
                 {navbarLayout === "centered" && <CenteredNavbar brandName={brandName} />}
@@ -62,6 +65,10 @@ export default async function DomainHomePage({ params }: { params: Promise<{ dom
             {footerLayout === "minimalcontact" && <MinimalContactFooter brandName={brandName} />}
             {footerLayout === "centered" && <CenteredFooter brandName={brandName} />}
             {footerLayout === "newsletter" && <NewsletterFooter brandName={brandName} />}
+
+            {
+                settings?.enableNewsletter && <NewsletterModal theme={theme}  />
+            }
 
             <CookieConsent settings={settings ? JSON.parse(JSON.stringify(settings)) : null} />
         </div>
