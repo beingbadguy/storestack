@@ -15,12 +15,12 @@ import { useAuthStore } from "@/store/useStore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast";
-import { 
-  FiSettings, 
-  FiMail, 
-  FiNavigation, 
-  FiLayout, 
-  FiShoppingCart, 
+import {
+  FiSettings,
+  FiMail,
+  FiNavigation,
+  FiLayout,
+  FiShoppingCart,
   FiLayers,
   FiGlobe,
   FiPhone,
@@ -36,9 +36,10 @@ import {
   FiPlusCircle,
   FiXCircle
 } from "react-icons/fi";
-import { BiCross, BiX } from "react-icons/bi";
+import { BiCross, BiSearch, BiX } from "react-icons/bi";
+import { PiImageSquareThin } from "react-icons/pi";
 
-type TabId = "general" | "newsletter" | "navbar" | "footer" | "seller"  | "theme";
+type TabId = "general" | "newsletter" | "navbar" | "footer" | "seller" | "theme" | 'faq' | 'design';
 
 interface Tab {
   id: TabId;
@@ -48,17 +49,19 @@ interface Tab {
 
 const tabs: Tab[] = [
   { id: "general", label: "General", icon: <FiGlobe className="w-4 h-4 mr-2" /> },
-  { id: "newsletter", label: "Newsletter", icon: <FiMail className="w-4 h-4 mr-2" /> },
+  { id: "design", label: "Design", icon: <FiSearch className="w-4 h-4 mr-2" /> },
   { id: "navbar", label: "Navbar", icon: <FiNavigation className="w-4 h-4 mr-2" /> },
   { id: "footer", label: "Footer", icon: <FiLayout className="w-4 h-4 mr-2" /> },
-  { id: "seller", label: "Seller", icon: <FiShoppingCart className="w-4 h-4 mr-2" /> },
+  // { id: "seller", label: "Seller", icon: <FiShoppingCart className="w-4 h-4 mr-2" /> },
   { id: "theme", label: "Theme", icon: <FiImage className="w-4 h-4 mr-2" /> },
+  { id: "faq", label: "FAQ", icon: <FiSearch className="w-4 h-4 mr-2" /> },
+  { id: "newsletter", label: "Newsletter", icon: <FiMail className="w-4 h-4 mr-2" /> },
 ];
 
 export default function WebsiteSettingsPage() {
 
-  const {user,setSellerDomain} = useAuthStore()
-  
+  const { user, setSellerDomain } = useAuthStore()
+
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [isDomainAvailable, setIsDomainAvailable] = useState<boolean>(false);
   const [domain, setDomain] = useState("");
@@ -76,6 +79,7 @@ export default function WebsiteSettingsPage() {
   const [settings, setSettings] = useState({
     brandName: "",
     websiteTitle: "",
+    websiteDescription: "",
     siteFavicon: "",
     footerLogo: "",
     siteLogoLight: "",
@@ -100,7 +104,7 @@ export default function WebsiteSettingsPage() {
       linkedin: "",
       youtube: ""
     },
-    enableCookieConsent: true,
+    enableCookieConsent: false,
     cookiePosition: "bottom",
     cookieText: "We use cookies to improve your experience, analyze site traffic, and support personalized advertising. By continuing to browse, you consent to the use of essential, analytics, and marketing cookies in accordance with our Privacy Policy.",
     enableNewsletter: false,
@@ -111,15 +115,15 @@ export default function WebsiteSettingsPage() {
     footerLayout: "multicolumn"
   });
 
-  const checkDomain = async(slug:string) => {
+  const checkDomain = async (slug: string) => {
     try {
       const response = await axiosClient.get(API_ENDPOINTS.GET_DOMAIN, {
         params: {
-          domain:slug
+          domain: slug
         }
       });
       setIsDomainAvailable(response.data.success);
-    } catch (error:any) {
+    } catch (error: any) {
       setIsDomainAvailable(false);
     }
   }
@@ -127,81 +131,81 @@ export default function WebsiteSettingsPage() {
   const deployWebsite = async () => {
     try {
       const response = await axiosClient.post(API_ENDPOINTS.DEPLOY_WEBSITE, {
-        slug:domain,
-        userId:user?.userId,
+        slug: domain,
+        userId: user?.userId,
       });
       toast.success("your website has been deployed successfully.")
       setReadyToDeploy(false)
       checkDomain(domain);
       isTenantLive()
-    } catch (error:any) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to deploy website");
     }
   }
 
   const getWebSettings = async (tId: string) => {
-      try {
-        const response = await axiosClient.get(API_ENDPOINTS.GET_WEBSETTINGS, {
-          params: {
-            tenantId: tId,
-          }
-        })
-
-        if (!settings?.cookieText) {
-          setCookieError("Please add cookie text.")
+    try {
+      const response = await axiosClient.get(API_ENDPOINTS.GET_WEBSETTINGS, {
+        params: {
+          tenantId: tId,
         }
+      })
 
-        if (response?.data?.data) {
-          setSettings(prev => ({
-            ...prev,
-            ...response.data.data,
-            socialLinks: {
-              ...prev.socialLinks,
-              ...(response.data.data.socialLinks || {})
-            }
-          }));
-
-          console.log("response.data.data?.enablenewsletter", response.data.data?.enableNewsletter)
-          if(response.data.data?.enableNewsletter){
-            setNewsletterEnabled(true)
-          }
-          else {
-            setNewsletterEnabled(false)
-          }
-          if (response.data.data.theme) {
-            setSelectedTheme(response.data.data.theme);
-          }
-        }
-      } catch (error) {
-        console.log(error);
-        setNewsletterEnabled(false)
+      if (!settings?.cookieText) {
+        setCookieError("Please add cookie text.")
       }
+
+      if (response?.data?.data) {
+        setSettings(prev => ({
+          ...prev,
+          ...response.data.data,
+          socialLinks: {
+            ...prev.socialLinks,
+            ...(response.data.data.socialLinks || {})
+          }
+        }));
+
+        console.log("response.data.data?.enablenewsletter", response.data.data?.enableNewsletter)
+        if (response.data.data?.enableNewsletter) {
+          setNewsletterEnabled(true)
+        }
+        else {
+          setNewsletterEnabled(false)
+        }
+        if (response.data.data.theme) {
+          setSelectedTheme(response.data.data.theme);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      setNewsletterEnabled(false)
+    }
   }
 
   const isTenantLive = async () => {
-    if(!user?.userId){
+    if (!user?.userId) {
       router.push('/login')
-      return 
+      return
     }
     try {
-       const res = await axiosClient.get(API_ENDPOINTS.GET_TENANT_DETAIL, {
-         params: {
-           sellerId:user?.userId,
-         }
-       })
-      if(res?.data?.success){
+      const res = await axiosClient.get(API_ENDPOINTS.GET_TENANT_DETAIL, {
+        params: {
+          sellerId: user?.userId,
+        }
+      })
+      if (res?.data?.success) {
         setIsWebsiteLive(res.data.data?.isWebsiteLive)
         setDomain(res?.data.data?.slug)
         const tId = res?.data?.data?._id;
         setTenantId(tId);
         if (res?.data?.data?.isWebsiteLive) {
-         setSellerDomain(res?.data.data?.slug) 
+          setSellerDomain(res?.data.data?.slug)
         }
         if (tId) {
           getWebSettings(tId);
         }
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.log(error.response?.data);
     }
   }
@@ -220,7 +224,7 @@ export default function WebsiteSettingsPage() {
       tenantId: tenantId,
       sellerId: user?.userId,
       ...settings,
-      
+
       theme: selectedTheme
     });
 
@@ -238,8 +242,8 @@ export default function WebsiteSettingsPage() {
   }
 
   useEffect(() => {
-   isTenantLive()
-  },[user?.userId])
+    isTenantLive()
+  }, [user?.userId])
 
   const handleSocialChange = (platform: keyof typeof settings.socialLinks, value: string) => {
     setSettings(prev => ({
@@ -266,7 +270,7 @@ export default function WebsiteSettingsPage() {
             </p>
           </div>
         </div>
-        <button className="mt-4 md:mt-0 px-5 py-2.5 bg-teal-600 text-white rounded-lg flex items-center gap-2 hover:bg-teal-700 transition-colors shadow-sm font-medium text-sm cursor-pointer" onClick={saveWebSettings}>
+        <button className="mt-4 md:mt-0 px-5 py-2.5 bg-teal-600 text-white rounded-lg flex items-center gap-2 hover:bg-teal-700 transition-colors shadow-sm font-medium text-sm cursor-pointer text-center self-start lg:self-end" onClick={saveWebSettings}>
           <FiSave className="w-4 h-4" />
           Save Changes
         </button>
@@ -278,11 +282,10 @@ export default function WebsiteSettingsPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center justify-center py-2 px-6 text-sm font-medium transition-all whitespace-nowrap outline-none rounded-full flex-1 cursor-pointer ${
-              activeTab === tab.id
-                ? "bg-teal-600 text-white shadow-md"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-            }`}
+            className={`flex items-center justify-center py-2 px-6 text-sm font-medium transition-all whitespace-nowrap outline-none rounded-full flex-1 cursor-pointer ${activeTab === tab.id
+              ? "bg-teal-600 text-white shadow-md"
+              : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+              }`}
           >
             {tab.icon}
             {tab.label}
@@ -292,6 +295,7 @@ export default function WebsiteSettingsPage() {
 
       {/* Tab Content */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+
         {activeTab === "general" && (
           <div className="p-8 space-y-10">
             {/* Basic Information */}
@@ -300,138 +304,151 @@ export default function WebsiteSettingsPage() {
                 <FiGlobe className="w-5 h-5" />
                 <h2 className="text-base font-semibold">Basic Information</h2>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="col-span-1 md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
                     Brand Name <span className="text-red-500">*</span>
                   </label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={settings.brandName}
-                    onChange={(e) => setSettings({...settings, brandName: e.target.value})}
+                    onChange={(e) => setSettings({ ...settings, brandName: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors text-sm"
                   />
                 </div>
 
                 {
                   !isWebsiteLive && (
-                      <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
-                    Website Domain <span className="text-red-500">*</span>
-                    <span className="w-3.5 h-3.5 rounded-full border border-gray-400 text-gray-400 flex items-center justify-center text-[9px] font-bold">i</span>
-                  </label>
-                  <div className="flex items-center justify-start">
-                    <input 
-                      type="text" 
-                      placeholder="Enter Domain"
-                      value={domain}
-                      className="w-full px-4 py-2.5 rounded-lg border-l border-gray-200 bg-gray-50 text-gray-500 focus:outline-none text-sm pr-10"
-                      onChange={(e) => {
-                        setDomain(e.target.value);
-                        checkDomain(e.target.value)
-                      }}
-                    />
-                    <span className=" px-4 py-2.5 rounded-lg border-r border-gray-200 bg-gray-50 text-gray-500 focus:outline-none text-sm pr-10 bg-teal-50 font-bold">.amancodes.in</span>
-                    <FiCheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
-                  </div>
-                  <div className="flex flex-col justify-between gap-2 items-start mt-2">
-                    <div className="w-auto">
-                      {
-                        domain?.length === 0 && <p className="text-xs text-gray-500 font-medium flex items-center justify-center">Enter Domain Name</p>
-                      }
-                    {
-                      domain?.length > 0 && (
-                        isDomainAvailable ? (
-                          <p className="text-xs text-teal-500 font-medium flex items-center justify-center">  <FiCheckCircle className="w-3 h-3 mr-1" />Domain is available -- ( { domain+ ".amancodes.in"} )</p>
-                        ) : (
-                          <p className="text-xs text-red-500 font-medium flex items-center justify-center"> <FiXCircle className="w-3 h-3 mr-1" />Domain is not available -- ( { domain+ ".amancodes.in"} )</p>
-                        )
-                      )
-                      }
-                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
+                        Website Domain <span className="text-red-500">*</span>
+                        <span className="w-3.5 h-3.5 rounded-full border border-gray-400 text-gray-400 flex items-center justify-center text-[9px] font-bold">i</span>
+                      </label>
+                      <div className="flex items-center justify-start">
+                        <input
+                          type="text"
+                          placeholder="Enter Domain"
+                          value={domain}
+                          className="w-full px-4 py-2.5 rounded-lg border-l border-gray-200 bg-gray-50 text-gray-500 focus:outline-none text-sm pr-10"
+                          onChange={(e) => {
+                            setDomain(e.target.value);
+                            checkDomain(e.target.value)
+                          }}
+                        />
+                        <span className=" px-4 py-2.5 rounded-lg border-r border-gray-200 bg-gray-50 text-gray-500 focus:outline-none text-sm pr-10 bg-teal-50 font-bold">.amancodes.in</span>
+                        <FiCheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                      </div>
+                      <div className="flex flex-col justify-between gap-2 items-start mt-2">
+                        <div className="w-auto">
+                          {
+                            domain?.length === 0 && <p className="text-xs text-gray-500 font-medium flex items-center justify-center">Enter Domain Name</p>
+                          }
+                          {
+                            domain?.length > 0 && (
+                              isDomainAvailable ? (
+                                <p className="text-xs text-teal-500 font-medium flex items-center justify-center">  <FiCheckCircle className="w-3 h-3 mr-1" />Domain is available -- ( {domain + ".amancodes.in"} )</p>
+                              ) : (
+                                <p className="text-xs text-red-500 font-medium flex items-center justify-center"> <FiXCircle className="w-3 h-3 mr-1" />Domain is not available -- ( {domain + ".amancodes.in"} )</p>
+                              )
+                            )
+                          }
+                        </div>
 
-                    {
-                      isDomainAvailable && domain?.length > 0 && (
-                         <button className="px-3 py-3 border border-gray-200 text-gray-700 rounded-md text-xs font-semibold hover:bg-teal-100 flex items-center gap-1.5 cursor-pointer bg-teal-50 text-teal-500 " onClick={()=> setReadyToDeploy(true)}>
-                      <FiPlusCircle className="w-3 h-3 font-bold" />
-                      Deploy Website
-                    </button>
-                      )
-                    }
-                   
-                  </div>
-                </div>
+                        {
+                          isDomainAvailable && domain?.length > 0 && (
+                            <button className="px-3 py-3 border border-gray-200 text-gray-700 rounded-md text-xs font-semibold hover:bg-teal-100 flex items-center gap-1.5 cursor-pointer bg-teal-50 text-teal-500 " onClick={() => setReadyToDeploy(true)}>
+                              <FiPlusCircle className="w-3 h-3 font-bold" />
+                              Deploy Website
+                            </button>
+                          )
+                        }
+
+                      </div>
+                    </div>
                   )
-               }
+                }
                 {
                   readyToDeploy && (
-                   <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40">
-          <div className="w-[90%] max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Confirm Deployment
-            </h2>
+                    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40">
+                      <div className="w-[90%] max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                        <h2 className="text-xl font-semibold text-gray-800">
+                          Confirm Deployment
+                        </h2>
 
-            <p className="mt-2 text-sm text-gray-600">
-              Are you sure you want to deploy your website?
-            </p>
+                        <p className="mt-2 text-sm text-gray-600">
+                          Are you sure you want to deploy your website?
+                        </p>
 
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={() => setReadyToDeploy(false)}
-                className="rounded-lg border border-gray-300 cursor-pointer px-4 py-2 text-sm font-medium transition hover:bg-gray-100"
-              >
-                Cancel
-              </button>
+                        <div className="mt-6 flex justify-end gap-3">
+                          <button
+                            onClick={() => setReadyToDeploy(false)}
+                            className="rounded-lg border border-gray-300 cursor-pointer px-4 py-2 text-sm font-medium transition hover:bg-gray-100"
+                          >
+                            Cancel
+                          </button>
 
-              <button
-                onClick={deployWebsite}
-                className="rounded-lg bg-teal-500 cursor-pointer px-4 py-2 text-sm font-medium text-white transition hover:bg-teal-600"
-              >
-                Deploy
-              </button>
-            </div>
-          </div>
-        </div>
+                          <button
+                            onClick={deployWebsite}
+                            className="rounded-lg bg-teal-500 cursor-pointer px-4 py-2 text-sm font-medium text-white transition hover:bg-teal-600"
+                          >
+                            Deploy
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   )
                 }
 
                 {
                   isWebsiteLive && (
-                     <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
-                    Website Domain <span className="text-red-500">*</span>
-                    <span className="w-3.5 h-3.5 rounded-full border border-gray-400 text-gray-400 flex items-center justify-center text-[9px] font-bold">i</span>
-                  </label>
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      value={"https://"+domain+".amancodes.in"}
-                      readOnly
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 focus:outline-none text-sm pr-10"
-                    />
-                    <FiCheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
-                  </div>
-                  <div className="flex justify-between items-start mt-2">
-                    <p className="text-xs text-gray-400">Your website domain is set and cannot be changed</p>
-                    <button className="px-3 py-1.5 border border-gray-200 text-gray-700 rounded-md text-xs font-medium hover:bg-gray-50 flex items-center gap-1.5">
-                      <FiRefreshCcw className="w-3 h-3" />
-                      Request Change
-                    </button>
-                  </div>
-                </div> 
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
+                        Website Domain <span className="text-red-500">*</span>
+                        <span className="w-3.5 h-3.5 rounded-full border border-gray-400 text-gray-400 flex items-center justify-center text-[9px] font-bold">i</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={"https://" + domain + ".amancodes.in"}
+                          readOnly
+                          className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 focus:outline-none text-sm pr-10"
+                        />
+                        <FiCheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-500 w-4 h-4" />
+                      </div>
+                      <div className="flex justify-between items-start mt-2">
+                        <p className="text-xs text-gray-400">Your website domain is set and cannot be changed</p>
+                        <button className="px-3 py-1.5 border border-gray-200 text-gray-700 rounded-md text-xs font-medium hover:bg-gray-50 flex items-center gap-1.5">
+                          <FiRefreshCcw className="w-3 h-3" />
+                          Request Change
+                        </button>
+                      </div>
+                    </div>
                   )
                 }
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
                     Website Title
                   </label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={settings.websiteTitle}
-                    onChange={(e) => setSettings({...settings, websiteTitle: e.target.value})}
+                    onChange={(e) => setSettings({ ...settings, websiteTitle: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors text-sm"
+                  />
+                </div>
+
+                <div className="col-span-1 md:col-span-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                    Website Description
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={settings.websiteDescription}
+                    onChange={(e) => setSettings({ ...settings, websiteDescription: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors text-sm resize-none"
+                    placeholder="Enter website description used in footers..."
                   />
                 </div>
 
@@ -440,13 +457,13 @@ export default function WebsiteSettingsPage() {
 
             {/* Media & Branding */}
             {/* <div> */}
-              {/* <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-200">
+            {/* <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-200">
                 <FiImage className="w-5 h-5" />
                 <h2 className="text-base font-semibold">Media & Branding</h2>
               </div>
                */}
-              {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"> */}
-                {/* <div>
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"> */}
+            {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Site Favicon</label>
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
@@ -457,7 +474,7 @@ export default function WebsiteSettingsPage() {
                     </button>
                   </div>
                 </div> */}
-{/* 
+            {/* 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Footer Logo</label>
                   <div className="flex items-center gap-4">
@@ -474,7 +491,7 @@ export default function WebsiteSettingsPage() {
                   </div>
                 </div> */}
 
-                {/* <div>
+            {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Site Logo Light</label>
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-32 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
@@ -498,7 +515,7 @@ export default function WebsiteSettingsPage() {
                   </div>
                 </div> */}
 
-                {/* <div className="col-span-1 md:col-span-2 border-t border-gray-100 pt-6 mt-2 flex flex-col gap-6">
+            {/* <div className="col-span-1 md:col-span-2 border-t border-gray-100 pt-6 mt-2 flex flex-col gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Banner Type</label>
                     <select 
@@ -520,7 +537,7 @@ export default function WebsiteSettingsPage() {
                     </label> 
                   </div>
                 </div> */}
-              {/* </div>
+            {/* </div>
             </div> */}
 
             {/* Legal & Compliance */}
@@ -530,205 +547,197 @@ export default function WebsiteSettingsPage() {
                 <h2 className="text-base font-semibold">Legal & Cookie Compliance</h2>
               </div>
               <div className="flex justify-between items-center my-3 ">
-                  <label className="text-sm font-medium text-gray-700">Enable Cookie Consent Banner</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                     
-                   <input 
-                        type="checkbox" 
-                        checked={settings.enableCookieConsent}
-                        onChange={(e) => setSettings({...settings, enableCookieConsent: e.target.checked})}
-                        className="sr-only peer" 
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
-                    </label>
-                  </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                <div className="col-span-1 md:col-span-2 flex flex-col md:flex-row gap-6 md:items-end">
-                  <div className="flex-1 md:max-w-md">
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Cookie Position</label>
-                    <select 
-                      value={settings.cookiePosition}
-                      onChange={(e) => setSettings({...settings, cookiePosition: e.target.value})}
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm bg-white"
-                    >
-                      <option value="bottom">Bottom Bar</option>
-                      <option value="top">Top Bar</option>
-                      <option value="center">Center Modal</option>
-                    </select>
-                  </div>
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Enable Cookie Consent Banner</span>
+                <label className="relative inline-flex items-center cursor-pointer">
 
-                  
-                </div>
-
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Cookie Text</label>
-                  <textarea 
-                    rows={3} 
-                    value={settings.cookieText}
-                    onChange={(e) => setSettings({...settings, cookieText: e.target.value})}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm resize-none"
-                  ></textarea>
-                      {
-                  cookieError && (
-                    <p className="text-red-500 text-sm">{cookieError}</p>
-                  )
-                }
-                </div>
-            
-
-               
+                  <input
+                    type="checkbox"
+                    checked={settings.enableCookieConsent}
+                    defaultChecked={settings.enableCookieConsent || false}
+                    onChange={(e) => setSettings({ ...settings, enableCookieConsent: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
+                </label>
               </div>
+              {
+                settings?.enableCookieConsent && (
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div className="col-span-1 md:col-span-2 flex flex-col md:flex-row gap-6 md:items-end">
+                      <div className="flex-1 md:max-w-md">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Cookie Position</label>
+                        <select
+                          value={settings.cookiePosition}
+                          onChange={(e) => setSettings({ ...settings, cookiePosition: e.target.value })}
+                          className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm bg-white"
+                        >
+                          <option value="bottom">Bottom Bar</option>
+                          <option value="top">Top Bar</option>
+                          <option value="center">Center Modal</option>
+                        </select>
+                      </div>
+
+
+                    </div>
+
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Cookie Text</label>
+                      <textarea
+                        rows={3}
+                        value={settings.cookieText}
+                        onChange={(e) => setSettings({ ...settings, cookieText: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm resize-none"
+                      ></textarea>
+                      {
+                        cookieError && (
+                          <p className="text-red-500 text-sm">{cookieError}</p>
+                        )
+                      }
+                    </div>
+
+
+
+                  </div>
+                )
+
+              }
+
             </div>
           </div>
         )}
+
+
 
         {/* newsletter tab  */}
         {
           activeTab === "newsletter" && (
             <div className="p-4">
               <div className="flex items-center justify-between">
-                <p>Enable Newsletter</p>
-                 <label className="relative inline-flex items-center cursor-pointer">
-                     
-                   <input 
-                        type="checkbox" 
-                        checked={settings.enableNewsletter}
-                        onChange={(e) => setSettings({...settings, enableNewsletter: e.target.checked})}
-                        className="sr-only peer" 
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
-                    </label>
-              </div> 
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Enable Newsletter</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+
+                  <input
+                    type="checkbox"
+                    checked={settings.enableNewsletter}
+                    onChange={(e) => setSettings({ ...settings, enableNewsletter: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
+                </label>
+              </div>
               {
-                newsletterEnabled && settings.enableNewsletter && (
+                (newsletterEnabled && settings.enableNewsletter) && (
                   <div className="mt-4 flex w-full flex-col lg:flex-row">
-
-                    <div className="w-full  ">
-
-                    {/* newsletter title  */}
-                     <label htmlFor="newsletterTitle" className="block text-sm font-medium text-gray-700 mb-2">Newsletter Title</label>
-                    <input 
-                      id="newsletterTitle" 
-                      value={settings.newsletterTitle}
-                      onChange={(e) => setSettings({...settings, newsletterTitle: e.target.value})}
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm "
-                    />
-                    {/* newsletter text  */}
-                    <label htmlFor="newsletterText" className="block text-sm font-medium text-gray-700 mb-2 my-2">Newsletter Text</label>
-                    <textarea 
-                      id="newsletterText" 
-                      rows={3} 
-                      value={settings.newsletterText}
-                      onChange={(e) => setSettings({...settings, newsletterText: e.target.value})}
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm resize-none"
-                    ></textarea>
-                    {/* newsletter background  */}
-                     {/* <label htmlFor="newsletterBgImage" className="block text-sm font-medium text-gray-700 mb-2">Newsletter Background</label>
-                    <textarea 
-                      id="newsletterBgImage" 
-                      rows={3} 
-                      value={settings.newsletterBgImage}
-                      onChange={(e) => setSettings({...settings, newsletterBgImage: e.target.value})}
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm resize-none"
-                    ></textarea> */}
-
-                    </div>
-
-
-
                     <div className=" flex items-center justify-center p-4">
-            <div className="relative w-full max-w-lg overflow-hidden rounded-[32px] bg-white shadow-2xl">
+                      <div className="relative w-full max-w-xl overflow-hidden rounded-[32px] bg-white shadow-2xl">
 
-                {/* Close Button */}
-                <button
-                    // onClick={() => setOpen(false)}
-                    className="absolute right-5 top-5 z-20 rounded-full bg-white/90 p-2 text-gray-500 transition hover:bg-gray-100"
-                >
-                    <BiX size={18} />
-                </button>
+                        {/* Close Button */}
+                        <button
+                          // onClick={() => setOpen(false)}
+                          className="absolute right-5 top-5 z-20 rounded-full bg-white/90 p-2 text-gray-500 transition hover:bg-gray-100"
+                        >
+                          <BiX size={18} />
+                        </button>
 
-                {/* Top Background */}
-                <div className="relative h-[280px] overflow-hidden bg-gradient-to-b from-teal-400 via-teal-300 tealto-orange-100">
+                        {/* Top Background */}
+                        <div className="relative h-[280px] overflow-hidden bg-gradient-to-b from-teal-400 via-teal-300 tealto-orange-100">
 
-                    {/* Curved Lines */}
-                    <div className="absolute inset-0 opacity-30">
-                        <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full border border-white/60"></div>
-                        <div className="absolute left-1/2 top-8 h-[450px] w-[450px] -translate-x-1/2 rounded-full border border-white/50"></div>
-                        <div className="absolute left-1/2 top-16 h-[400px] w-[400px] -translate-x-1/2 rounded-full border border-white/40"></div>
-                    </div>
+                          {/* Curved Lines */}
+                          <div className="absolute inset-0 opacity-30">
+                            <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full border border-white/60"></div>
+                            <div className="absolute left-1/2 top-8 h-[450px] w-[450px] -translate-x-1/2 rounded-full border border-white/50"></div>
+                            <div className="absolute left-1/2 top-16 h-[400px] w-[400px] -translate-x-1/2 rounded-full border border-white/40"></div>
+                          </div>
 
-                    {/* Envelope */}
-                    <div className="absolute bottom-[-30px] left-1/2 flex -translate-x-1/2 justify-center">
-                        <div className="relative h-[180px] w-[240px]">
+                          {/* Envelope */}
+                          <div className="absolute bottom-[-30px] left-1/2 flex -translate-x-1/2 justify-center">
+                            <div className="relative h-[180px] w-[240px]">
 
-                            {/* Letter */}
-                            <div className="absolute left-1/2 top-0 h-[110px] w-[170px] -translate-x-1/2 rounded-md bg-gray-100 shadow-md">
+                              {/* Letter */}
+                              <div className="absolute left-1/2 top-0 h-[110px] w-[170px] -translate-x-1/2 rounded-md bg-gray-100 shadow-md">
                                 <div className="mt-5 space-y-2 px-4">
-                                    <div className="h-2 rounded bg-gray-300"></div>
-                                    <div className="h-2 rounded bg-gray-200"></div>
-                                    <div className="h-2 w-3/4 rounded bg-gray-200"></div>
+                                  <div className="h-2 rounded bg-gray-300"></div>
+                                  <div className="h-2 rounded bg-gray-200"></div>
+                                  <div className="h-2 w-3/4 rounded bg-gray-200"></div>
                                 </div>
+                              </div>
+
+                              {/* Envelope Body */}
+                              <div className="absolute bottom-0 h-[140px] w-full rounded-b-2xl bg-white shadow-xl"></div>
+
+                              {/* Left Fold */}
+                              <div className="absolute bottom-0 left-0 h-0 w-0 border-b-[70px] border-l-[120px] border-b-gray-100 border-l-transparent"></div>
+
+                              {/* Right Fold */}
+                              <div className="absolute bottom-0 right-0 h-0 w-0 border-b-[70px] border-r-[120px] border-b-gray-100 border-r-transparent"></div>
+
+                              {/* Top Fold */}
+                              <div className="absolute top-[40px] h-0 w-0 border-l-[120px] border-r-[120px] border-t-[80px] border-l-transparent border-r-transparent border-t-white"></div>
                             </div>
-
-                            {/* Envelope Body */}
-                            <div className="absolute bottom-0 h-[140px] w-full rounded-b-2xl bg-white shadow-xl"></div>
-
-                            {/* Left Fold */}
-                            <div className="absolute bottom-0 left-0 h-0 w-0 border-b-[70px] border-l-[120px] border-b-gray-100 border-l-transparent"></div>
-
-                            {/* Right Fold */}
-                            <div className="absolute bottom-0 right-0 h-0 w-0 border-b-[70px] border-r-[120px] border-b-gray-100 border-r-transparent"></div>
-
-                            {/* Top Fold */}
-                            <div className="absolute top-[40px] h-0 w-0 border-l-[120px] border-r-[120px] border-t-[80px] border-l-transparent border-r-transparent border-t-white"></div>
+                          </div>
                         </div>
+
+                        {/* Content */}
+                        <div className="px-8 pb-10 pt-20 text-center">
+                          <h2 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">
+                            {settings.newsletterTitle || "Sign Up For Our Newsletter"}
+                          </h2>
+
+                          <p className="mt-5 text-lg leading-relaxed text-gray-500">
+                            {settings.newsletterText || "Receive new updates delivered to your inbox"}
+
+                          </p>
+
+                          {/* Input */}
+                          <div className="mt-8">
+                            <input
+                              type="email"
+                              placeholder="Your Email"
+                              className="h-14 w-full rounded-2xl border border-gray-200 px-5 text-base outline-none transition focus:border-teal-400"
+                            />
+                          </div>
+
+                          {/* Button */}
+                          <button className="mt-5 h-14 w-full rounded-2xl bg-teal-500 text-lg font-medium text-white shadow-lg transition hover:bg-teal-600">
+                            Sign up
+                          </button>
+
+                          {/* Footer Text */}
+                          <p className="mt-6 text-sm text-gray-400">
+                            Don’t worry, we won’t send you spam or sell your data.
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                </div>
 
-                {/* Content */}
-                <div className="px-8 pb-10 pt-20 text-center">
-                    <h2 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">
-                      {settings.newsletterTitle || "Sign Up For Our Newsletter"}
-                    </h2>
+                    <div className="w-full lg:w-[60%] lg:mt-0 mt-4 ">
 
-                    <p className="mt-5 text-lg leading-relaxed text-gray-500">
-                      {settings.newsletterText || "Receive new updates delivered to your inbox"}
-                       
-                    </p>
-
-                    {/* Input */}
-                    <div className="mt-8">
-                        <input
-                            type="email"
-                            placeholder="Your Email"
-                            className="h-14 w-full rounded-2xl border border-gray-200 px-5 text-base outline-none transition focus:border-teal-400"
-                        />
+                      {/* newsletter title  */}
+                      <label htmlFor="newsletterTitle" className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Newsletter Title</label>
+                      <input
+                        id="newsletterTitle"
+                        value={settings.newsletterTitle}
+                        onChange={(e) => setSettings({ ...settings, newsletterTitle: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm "
+                      />
+                      {/* newsletter text  */}
+                      <label htmlFor="newsletterText" className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 my-2">Newsletter Text</label>
+                      <textarea
+                        id="newsletterText"
+                        rows={3}
+                        value={settings.newsletterText}
+                        onChange={(e) => setSettings({ ...settings, newsletterText: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm resize-none"
+                      ></textarea>
                     </div>
-
-                    {/* Button */}
-                    <button className="mt-5 h-14 w-full rounded-2xl bg-teal-500 text-lg font-medium text-white shadow-lg transition hover:bg-teal-600">
-                        Sign up
-                    </button>
-
-                    {/* Footer Text */}
-                    <p className="mt-6 text-sm text-gray-400">
-                        Don’t worry, we won’t send you spam or sell your data.
-                    </p>
-                </div>
-            </div>
-                     </div>
                   </div>
-
-
-                  
-
                 )
               }
-
             </div>
           )
         }
-        
+
         {
           activeTab === "navbar" && (
             <div className="p-8">
@@ -737,109 +746,109 @@ export default function WebsiteSettingsPage() {
                 <h2 className="text-base font-semibold">Navbar Templates</h2>
               </div>
               <p className="text-sm text-gray-500 mb-6">Select the perfect navigation structure for your storefront.</p>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[
-                  { 
+                  {
                     id: "minimal", name: "Minimal Navbar", desc: "A clean, standard navigation bar.",
                     wireframe: (
                       <div className="w-full h-full bg-gray-50 flex items-start pt-4 px-4">
                         <div className="w-full bg-white shadow-sm border border-gray-100 rounded flex justify-between items-center p-2">
-                           <div className="w-16 h-2.5 bg-gray-300 rounded-sm"></div>
-                           <div className="flex gap-2">
-                             <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
-                             <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
-                             <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
-                           </div>
+                          <div className="w-16 h-2.5 bg-gray-300 rounded-sm"></div>
+                          <div className="flex gap-2">
+                            <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
+                            <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
+                            <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
+                          </div>
                         </div>
                       </div>
                     )
                   },
-                  { 
+                  {
                     id: "centered", name: "Centered Navbar", desc: "Logo centered with links below.",
                     wireframe: (
                       <div className="w-full h-full bg-gray-50 flex items-start pt-4 px-4">
                         <div className="w-full bg-white shadow-sm border border-gray-100 rounded flex flex-col items-center p-2 gap-2">
-                           <div className="w-16 h-2.5 bg-gray-300 rounded-sm"></div>
-                           <div className="flex gap-2">
-                             <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
-                             <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
-                             <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
-                           </div>
+                          <div className="w-16 h-2.5 bg-gray-300 rounded-sm"></div>
+                          <div className="flex gap-2">
+                            <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
+                            <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
+                            <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
+                          </div>
                         </div>
                       </div>
                     )
                   },
-                  { 
+                  {
                     id: "floating", name: "Floating Navbar", desc: "A floating pill-shaped navigation.",
                     wireframe: (
                       <div className="w-full h-full bg-gray-50 flex items-start justify-center pt-6 px-4">
                         <div className="w-3/4 bg-white shadow-md border border-gray-100 rounded-full flex justify-between items-center p-2 px-4">
-                           <div className="w-12 h-2 bg-gray-300 rounded-sm"></div>
-                           <div className="flex gap-2">
-                             <div className="w-4 h-1.5 bg-gray-200 rounded-sm"></div>
-                             <div className="w-4 h-1.5 bg-gray-200 rounded-sm"></div>
-                           </div>
+                          <div className="w-12 h-2 bg-gray-300 rounded-sm"></div>
+                          <div className="flex gap-2">
+                            <div className="w-4 h-1.5 bg-gray-200 rounded-sm"></div>
+                            <div className="w-4 h-1.5 bg-gray-200 rounded-sm"></div>
+                          </div>
                         </div>
                       </div>
                     )
                   },
-                  { 
+                  {
                     id: "dark", name: "Dark Navbar", desc: "A sleek dark-themed navigation.",
                     wireframe: (
                       <div className="w-full h-full bg-gray-50 flex items-start pt-4 px-4">
                         <div className="w-full bg-gray-900 shadow-sm rounded flex justify-between items-center p-2">
-                           <div className="w-16 h-2.5 bg-gray-400 rounded-sm"></div>
-                           <div className="flex gap-2">
-                             <div className="w-6 h-1.5 bg-gray-600 rounded-sm"></div>
-                             <div className="w-6 h-1.5 bg-gray-600 rounded-sm"></div>
-                             <div className="w-6 h-1.5 bg-gray-600 rounded-sm"></div>
-                           </div>
+                          <div className="w-16 h-2.5 bg-gray-400 rounded-sm"></div>
+                          <div className="flex gap-2">
+                            <div className="w-6 h-1.5 bg-gray-600 rounded-sm"></div>
+                            <div className="w-6 h-1.5 bg-gray-600 rounded-sm"></div>
+                            <div className="w-6 h-1.5 bg-gray-600 rounded-sm"></div>
+                          </div>
                         </div>
                       </div>
                     )
                   },
-                  { 
+                  {
                     id: "double", name: "Double Navbar", desc: "Two-tiered navigation bar.",
                     wireframe: (
                       <div className="w-full h-full bg-gray-50 flex items-start pt-4 px-4">
                         <div className="w-full bg-white shadow-sm border border-gray-100 rounded flex flex-col">
-                           <div className="w-full bg-gray-900 h-3 flex justify-end items-center px-2 rounded-t">
-                              <div className="w-12 h-1 bg-gray-500 rounded-sm"></div>
-                           </div>
-                           <div className="w-full flex justify-between items-center p-2">
-                             <div className="w-16 h-2.5 bg-gray-300 rounded-sm"></div>
-                             <div className="flex gap-2">
-                               <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
-                               <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
-                             </div>
-                           </div>
+                          <div className="w-full bg-gray-900 h-3 flex justify-end items-center px-2 rounded-t">
+                            <div className="w-12 h-1 bg-gray-500 rounded-sm"></div>
+                          </div>
+                          <div className="w-full flex justify-between items-center p-2">
+                            <div className="w-16 h-2.5 bg-gray-300 rounded-sm"></div>
+                            <div className="flex gap-2">
+                              <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
+                              <div className="w-6 h-1.5 bg-gray-200 rounded-sm"></div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )
                   }
                 ].map((layout) => (
-                  <div 
+                  <div
                     key={layout.id}
-                    onClick={() => setSettings({...settings, navbarLayout: layout.id})}
+                    onClick={() => setSettings({ ...settings, navbarLayout: layout.id })}
                     className={`cursor-pointer rounded-xl border-2 overflow-hidden transition-all bg-white flex flex-col group ${settings.navbarLayout === layout.id ? 'border-teal-500 shadow-md ring-1 ring-teal-500' : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'}`}
                   >
                     <div className="w-full aspect-[4/3] bg-gray-50 relative border-b border-gray-100">
                       {layout.wireframe}
-                      
+
                       <div className={`absolute inset-0 bg-white/40 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px] ${settings.navbarLayout === layout.id ? 'opacity-100' : ''}`}>
-                         <button 
-                           onClick={(e) => { e.stopPropagation(); setPreviewModal({ type: "navbar", layout: layout.id }) }}
-                           className="px-4 py-1.5 rounded-full font-medium text-sm bg-white text-gray-800 border border-gray-200 shadow-sm hover:bg-gray-50 flex items-center justify-center w-28"
-                         >
-                           Preview
-                         </button>
-                         <button 
-                           onClick={(e) => { e.stopPropagation(); setSettings({...settings, navbarLayout: layout.id}) }}
-                           className={`px-4 py-1.5 rounded-full font-medium text-sm flex items-center justify-center w-28 shadow-sm ${settings.navbarLayout === layout.id ? 'bg-teal-600 text-white' : 'bg-gray-800 text-white hover:bg-gray-900'}`}
-                         >
-                           {settings.navbarLayout === layout.id ? <><FiCheckCircle className="w-4 h-4 mr-1.5" /> Selected</> : 'Select'}
-                         </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setPreviewModal({ type: "navbar", layout: layout.id }) }}
+                          className="px-4 py-1.5 rounded-full font-medium text-sm bg-white text-gray-800 border border-gray-200 shadow-sm hover:bg-gray-50 flex items-center justify-center w-28"
+                        >
+                          Preview
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSettings({ ...settings, navbarLayout: layout.id }) }}
+                          className={`px-4 py-1.5 rounded-full font-medium text-sm flex items-center justify-center w-28 shadow-sm ${settings.navbarLayout === layout.id ? 'bg-teal-600 text-white' : 'bg-gray-800 text-white hover:bg-gray-900'}`}
+                        >
+                          {settings.navbarLayout === layout.id ? <><FiCheckCircle className="w-4 h-4 mr-1.5" /> Selected</> : 'Select'}
+                        </button>
                       </div>
                     </div>
                     <div className="p-5 flex-1 flex flex-col">
@@ -861,104 +870,104 @@ export default function WebsiteSettingsPage() {
                 <h2 className="text-base font-semibold">Footer Templates</h2>
               </div>
               <p className="text-sm text-gray-500 mb-6">Select the perfect footer structure for your storefront.</p>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[
-                  { 
+                  {
                     id: "multicolumn", name: "Multi Column Footer", desc: "Classic multi-column layout with brand info.",
                     wireframe: (
                       <div className="w-full h-full bg-gray-50 flex items-end pb-4 px-4">
                         <div className="w-full bg-white shadow-sm border border-gray-100 rounded flex flex-col p-3 gap-3">
-                           <div className="flex justify-between gap-4">
-                              <div className="w-1/3 h-10 bg-gray-200 rounded-sm"></div>
-                              <div className="flex gap-2 flex-1 justify-end">
-                                <div className="w-1/4 h-12 bg-gray-100 border border-gray-200 rounded-sm"></div>
-                                <div className="w-1/4 h-12 bg-gray-100 border border-gray-200 rounded-sm"></div>
-                                <div className="w-1/4 h-12 bg-gray-100 border border-gray-200 rounded-sm"></div>
-                              </div>
-                           </div>
-                           <div className="w-full h-2 bg-teal-500 rounded-sm opacity-50"></div>
+                          <div className="flex justify-between gap-4">
+                            <div className="w-1/3 h-10 bg-gray-200 rounded-sm"></div>
+                            <div className="flex gap-2 flex-1 justify-end">
+                              <div className="w-1/4 h-12 bg-gray-100 border border-gray-200 rounded-sm"></div>
+                              <div className="w-1/4 h-12 bg-gray-100 border border-gray-200 rounded-sm"></div>
+                              <div className="w-1/4 h-12 bg-gray-100 border border-gray-200 rounded-sm"></div>
+                            </div>
+                          </div>
+                          <div className="w-full h-2 bg-teal-500 rounded-sm opacity-50"></div>
                         </div>
                       </div>
                     )
                   },
-                  { 
+                  {
                     id: "minimalcontact", name: "Minimal Contact Footer", desc: "Clean layout focusing on contact info & CTA.",
                     wireframe: (
                       <div className="w-full h-full bg-gray-50 flex items-end pb-4 px-4">
                         <div className="w-full bg-white shadow-sm border border-gray-100 rounded flex flex-col p-3 gap-4">
-                           <div className="flex justify-between items-center">
-                              <div className="w-1/3 h-6 bg-gray-200 rounded-sm"></div>
-                              <div className="w-1/4 h-6 bg-gray-800 rounded-full"></div>
-                           </div>
-                           <div className="w-full h-px bg-gray-100"></div>
-                           <div className="flex gap-1">
-                             <div className="w-8 h-4 bg-gray-100 border border-gray-200 rounded-sm"></div>
-                             <div className="w-8 h-4 bg-gray-100 border border-gray-200 rounded-sm"></div>
-                           </div>
+                          <div className="flex justify-between items-center">
+                            <div className="w-1/3 h-6 bg-gray-200 rounded-sm"></div>
+                            <div className="w-1/4 h-6 bg-gray-800 rounded-full"></div>
+                          </div>
+                          <div className="w-full h-px bg-gray-100"></div>
+                          <div className="flex gap-1">
+                            <div className="w-8 h-4 bg-gray-100 border border-gray-200 rounded-sm"></div>
+                            <div className="w-8 h-4 bg-gray-100 border border-gray-200 rounded-sm"></div>
+                          </div>
                         </div>
                       </div>
                     )
                   },
-                  { 
+                  {
                     id: "centered", name: "Centered Footer", desc: "Everything centered beautifully.",
                     wireframe: (
                       <div className="w-full h-full bg-gray-50 flex items-end pb-4 px-4">
                         <div className="w-full bg-white shadow-sm border border-gray-100 rounded flex flex-col items-center p-3 gap-2">
-                           <div className="w-1/4 h-3 bg-gray-300 rounded-sm"></div>
-                           <div className="w-1/2 h-6 bg-gray-100 border border-gray-200 rounded-full mt-1"></div>
-                           <div className="flex gap-2 mt-2">
-                             <div className="w-6 h-1 bg-gray-200 rounded-sm"></div>
-                             <div className="w-6 h-1 bg-gray-200 rounded-sm"></div>
-                             <div className="w-6 h-1 bg-gray-200 rounded-sm"></div>
-                           </div>
-                           <div className="w-full h-1 bg-teal-500 rounded-sm opacity-50 mt-1"></div>
+                          <div className="w-1/4 h-3 bg-gray-300 rounded-sm"></div>
+                          <div className="w-1/2 h-6 bg-gray-100 border border-gray-200 rounded-full mt-1"></div>
+                          <div className="flex gap-2 mt-2">
+                            <div className="w-6 h-1 bg-gray-200 rounded-sm"></div>
+                            <div className="w-6 h-1 bg-gray-200 rounded-sm"></div>
+                            <div className="w-6 h-1 bg-gray-200 rounded-sm"></div>
+                          </div>
+                          <div className="w-full h-1 bg-teal-500 rounded-sm opacity-50 mt-1"></div>
                         </div>
                       </div>
                     )
                   },
-                  { 
+                  {
                     id: "newsletter", name: "Newsletter Footer", desc: "Prominent newsletter sign up on top.",
                     wireframe: (
                       <div className="w-full h-full bg-gray-50 flex items-end pb-4 px-4">
                         <div className="w-full bg-white shadow-sm border border-gray-100 rounded flex flex-col p-3 gap-3">
-                           <div className="flex justify-between items-center border-b border-gray-100 pb-2">
-                              <div className="w-1/3 h-4 bg-gray-300 rounded-sm"></div>
-                              <div className="w-1/3 h-6 bg-gray-100 border border-gray-200 rounded-full"></div>
-                           </div>
-                           <div className="flex justify-between gap-4 pt-1">
-                              <div className="w-1/3 h-8 bg-gray-200 rounded-sm"></div>
-                              <div className="flex gap-2 flex-1 justify-end">
-                                <div className="w-1/4 h-8 bg-gray-100 border border-gray-200 rounded-sm"></div>
-                                <div className="w-1/4 h-8 bg-gray-100 border border-gray-200 rounded-sm"></div>
-                              </div>
-                           </div>
+                          <div className="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <div className="w-1/3 h-4 bg-gray-300 rounded-sm"></div>
+                            <div className="w-1/3 h-6 bg-gray-100 border border-gray-200 rounded-full"></div>
+                          </div>
+                          <div className="flex justify-between gap-4 pt-1">
+                            <div className="w-1/3 h-8 bg-gray-200 rounded-sm"></div>
+                            <div className="flex gap-2 flex-1 justify-end">
+                              <div className="w-1/4 h-8 bg-gray-100 border border-gray-200 rounded-sm"></div>
+                              <div className="w-1/4 h-8 bg-gray-100 border border-gray-200 rounded-sm"></div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )
                   }
                 ].map((layout) => (
-                  <div 
+                  <div
                     key={layout.id}
-                    onClick={() => setSettings({...settings, footerLayout: layout.id})}
+                    onClick={() => setSettings({ ...settings, footerLayout: layout.id })}
                     className={`cursor-pointer rounded-xl border-2 overflow-hidden transition-all bg-white flex flex-col group ${settings.footerLayout === layout.id ? 'border-teal-500 shadow-md ring-1 ring-teal-500' : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'}`}
                   >
                     <div className="w-full aspect-[4/3] bg-gray-50 relative border-b border-gray-100">
                       {layout.wireframe}
-                      
+
                       <div className={`absolute inset-0 bg-white/40 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px] ${settings.footerLayout === layout.id ? 'opacity-100' : ''}`}>
-                         <button 
-                           onClick={(e) => { e.stopPropagation(); setPreviewModal({ type: "footer", layout: layout.id }) }}
-                           className="px-4 py-1.5 rounded-full font-medium text-sm bg-white text-gray-800 border border-gray-200 shadow-sm hover:bg-gray-50 flex items-center justify-center w-28"
-                         >
-                           Preview
-                         </button>
-                         <button 
-                           onClick={(e) => { e.stopPropagation(); setSettings({...settings, footerLayout: layout.id}) }}
-                           className={`px-4 py-1.5 rounded-full font-medium text-sm flex items-center justify-center w-28 shadow-sm ${settings.footerLayout === layout.id ? 'bg-teal-600 text-white' : 'bg-gray-800 text-white hover:bg-gray-900'}`}
-                         >
-                           {settings.footerLayout === layout.id ? <><FiCheckCircle className="w-4 h-4 mr-1.5" /> Selected</> : 'Select'}
-                         </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setPreviewModal({ type: "footer", layout: layout.id }) }}
+                          className="px-4 py-1.5 rounded-full font-medium text-sm bg-white text-gray-800 border border-gray-200 shadow-sm hover:bg-gray-50 flex items-center justify-center w-28"
+                        >
+                          Preview
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSettings({ ...settings, footerLayout: layout.id }) }}
+                          className={`px-4 py-1.5 rounded-full font-medium text-sm flex items-center justify-center w-28 shadow-sm ${settings.footerLayout === layout.id ? 'bg-teal-600 text-white' : 'bg-gray-800 text-white hover:bg-gray-900'}`}
+                        >
+                          {settings.footerLayout === layout.id ? <><FiCheckCircle className="w-4 h-4 mr-1.5" /> Selected</> : 'Select'}
+                        </button>
                       </div>
                     </div>
                     <div className="p-5 flex-1 flex flex-col">
@@ -979,7 +988,7 @@ export default function WebsiteSettingsPage() {
               <FiImage className="w-5 h-5" />
               <h2 className="text-base font-semibold">Theme & Colors</h2>
             </div>
-            
+
             <p className="text-sm text-gray-500 mb-6">Select a primary color combination for your website's buttons, accents, and backgrounds.</p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
@@ -991,22 +1000,22 @@ export default function WebsiteSettingsPage() {
                 { id: "rose-stone", name: "Rose & Stone", primary: "bg-rose-600", bg: "bg-stone-50", border: "border-stone-200" },
                 { id: "emerald-gray", name: "Emerald & Gray", primary: "bg-emerald-600", bg: "bg-gray-50", border: "border-gray-200" },
               ].map((theme) => (
-                <div 
+                <div
                   key={theme.id}
                   onClick={() => {
                     setSelectedTheme(theme.id);
-                    setSettings({...settings, theme: theme.id});
+                    setSettings({ ...settings, theme: theme.id });
                   }}
                   className={`cursor-pointer rounded-xl border-2 transition-all p-3 flex flex-col items-center gap-3 relative ${selectedTheme === theme.id ? 'border-teal-500 shadow-md scale-105' : 'border-gray-100 hover:border-gray-300 hover:shadow-sm'}`}
                 >
                   {/* Color Preview Box */}
                   <div className={`w-full aspect-video rounded-lg border ${theme.border} ${theme.bg} overflow-hidden flex flex-col`}>
                     <div className="h-1/3 bg-gray-100 border-b border-gray-200 flex flex-row items-center px-2 gap-1">
-                       <div className="w-2 h-2 rounded-full bg-gray-300"></div>
-                       <div className="w-6 h-1 rounded-full bg-gray-300"></div>
+                      <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                      <div className="w-6 h-1 rounded-full bg-gray-300"></div>
                     </div>
                     <div className="flex-1 flex items-center justify-center p-2">
-                       <div className={`w-full h-4 rounded ${theme.primary}`}></div>
+                      <div className={`w-full h-4 rounded ${theme.primary}`}></div>
                     </div>
                   </div>
                   <span className="text-xs font-semibold text-gray-700">{theme.name}</span>
@@ -1021,7 +1030,34 @@ export default function WebsiteSettingsPage() {
           </div>
         )}
 
-        {activeTab !== "general" && activeTab !== "navbar" && activeTab !== "footer" && activeTab !== "theme" && (
+        {
+          activeTab === 'faq' && (
+            <div className="p-8">
+              <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-100">
+                <BiSearch className="w-5 h-5" />
+                <h2 className="text-base font-semibold">Frequenty Asked Questions</h2>
+              </div>
+
+              <p className="text-sm text-gray-500 mb-6">Manage your FAQ items by adding, editing, or removing questions and answers that appear on your website.</p>
+
+              <div className="space-y-4">
+                <div className=" space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Question</label>
+                    <input type="text" className="mt-1 block border w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm p-3" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Answer</label>
+                    <textarea cols={3} className="mt-1 block w-full border rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm p-3 " />
+                  </div>
+                </div>
+                <button className="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600">Add FAQ</button>
+              </div>
+            </div>
+          )
+        }
+
+        {activeTab !== "general" && activeTab !== "navbar" && activeTab !== "footer" && activeTab !== "theme" && activeTab !== "newsletter" && activeTab !== "faq" && (
           <div className="p-8 min-h-[400px] flex items-center justify-center">
             <div className="text-center text-gray-500">
               <p className="text-lg font-medium">{tabs.find(t => t.id === activeTab)?.label} Settings</p>
@@ -1041,42 +1077,42 @@ export default function WebsiteSettingsPage() {
               </button>
             </div>
             <div className="overflow-y-auto flex-1 bg-gray-200 p-4 md:p-8 flex items-start justify-center">
-               <div className="w-full border border-gray-200 shadow-lg bg-white min-h-[500px] flex flex-col relative rounded overflow-hidden">
-                  {previewModal.type === "navbar" && (
-                    <div className="w-full flex-1 flex flex-col">
-                      <div className="w-full relative z-10">
-                        {previewModal.layout === "minimal" && <MinimalNavbar brandName={settings.brandName || domain || "BrandName"} />}
-                        {previewModal.layout === "centered" && <CenteredNavbar brandName={settings.brandName || domain || "BrandName"} />}
-                        {previewModal.layout === "floating" && <FloatingNavbar brandName={settings.brandName || domain || "BrandName"} />}
-                        {previewModal.layout === "dark" && <DarkNavbar brandName={settings.brandName || domain || "BrandName"} />}
-                        {previewModal.layout === "double" && <DoubleNavbar brandName={settings.brandName || domain || "BrandName"} />}
-                      </div>
-                      <div className="w-full flex-1 bg-gray-50 flex items-center justify-center text-gray-400 border-t border-gray-100">
-                        <div className="text-center">
-                           <h2 className="text-3xl font-bold text-gray-300 mb-2">Hero Section</h2>
-                           <p>Scroll down to see navbar behavior</p>
-                        </div>
+              <div className="w-full border border-gray-200 shadow-lg bg-white min-h-[500px] flex flex-col relative rounded overflow-hidden">
+                {previewModal.type === "navbar" && (
+                  <div className="w-full flex-1 flex flex-col">
+                    <div className="w-full relative z-10">
+                      {previewModal.layout === "minimal" && <MinimalNavbar brandName={settings.brandName || domain || "BrandName"} />}
+                      {previewModal.layout === "centered" && <CenteredNavbar brandName={settings.brandName || domain || "BrandName"} />}
+                      {previewModal.layout === "floating" && <FloatingNavbar brandName={settings.brandName || domain || "BrandName"} />}
+                      {previewModal.layout === "dark" && <DarkNavbar brandName={settings.brandName || domain || "BrandName"} />}
+                      {previewModal.layout === "double" && <DoubleNavbar brandName={settings.brandName || domain || "BrandName"} />}
+                    </div>
+                    <div className="w-full flex-1 bg-gray-50 flex items-center justify-center text-gray-400 border-t border-gray-100">
+                      <div className="text-center">
+                        <h2 className="text-3xl font-bold text-gray-300 mb-2">Hero Section</h2>
+                        <p>Scroll down to see navbar behavior</p>
                       </div>
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  {previewModal.type === "footer" && (
-                    <div className="w-full flex-1 flex flex-col">
-                       <div className="w-full flex-1 bg-gray-50 flex items-center justify-center text-gray-400 border-b border-gray-100 min-h-[300px]">
-                          <div className="text-center">
-                             <h2 className="text-3xl font-bold text-gray-300 mb-2">Page Content</h2>
-                             <p>Footer is displayed below</p>
-                          </div>
-                      </div>
-                      <div className="w-full relative z-10">
-                        {previewModal.layout === "multicolumn" && <MultiColumnFooter brandName={settings.brandName || domain || "BrandName"} />}
-                        {previewModal.layout === "minimalcontact" && <MinimalContactFooter brandName={settings.brandName || domain || "BrandName"} />}
-                        {previewModal.layout === "centered" && <CenteredFooter brandName={settings.brandName || domain || "BrandName"} />}
-                        {previewModal.layout === "newsletter" && <NewsletterFooter brandName={settings.brandName || domain || "BrandName"} />}
+                {previewModal.type === "footer" && (
+                  <div className="w-full flex-1 flex flex-col">
+                    <div className="w-full flex-1 bg-gray-50 flex items-center justify-center text-gray-400 border-b border-gray-100 min-h-[300px]">
+                      <div className="text-center">
+                        <h2 className="text-3xl font-bold text-gray-300 mb-2">Page Content</h2>
+                        <p>Footer is displayed below</p>
                       </div>
                     </div>
-                  )}
-               </div>
+                    <div className="w-full relative z-10">
+                      {previewModal.layout === "multicolumn" && <MultiColumnFooter brandName={settings.brandName || domain || "BrandName"} />}
+                      {previewModal.layout === "minimalcontact" && <MinimalContactFooter brandName={settings.brandName || domain || "BrandName"} />}
+                      {previewModal.layout === "centered" && <CenteredFooter brandName={settings.brandName || domain || "BrandName"} />}
+                      {previewModal.layout === "newsletter" && <NewsletterFooter brandName={settings.brandName || domain || "BrandName"} />}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

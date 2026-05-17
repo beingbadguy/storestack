@@ -61,13 +61,13 @@ export default async function DomainHomePage({ params }: { params: Promise<{ dom
                 </div>
             </div>
 
-            {footerLayout === "multicolumn" && <MultiColumnFooter brandName={brandName} />}
+            {footerLayout === "multicolumn" && <MultiColumnFooter brandName={brandName} description={settings?.websiteDescription} />}
             {footerLayout === "minimalcontact" && <MinimalContactFooter brandName={brandName} />}
             {footerLayout === "centered" && <CenteredFooter brandName={brandName} />}
-            {footerLayout === "newsletter" && <NewsletterFooter brandName={brandName} />}
+            {footerLayout === "newsletter" && <NewsletterFooter brandName={brandName} description={settings?.websiteDescription} />}
 
             {
-                settings?.enableNewsletter && <NewsletterModal theme={theme}  />
+                settings?.enableNewsletter && <NewsletterModal theme={theme} title={settings?.newsletterTitle} text={settings?.newsletterText}  />
             }
 
             <CookieConsent settings={settings ? JSON.parse(JSON.stringify(settings)) : null} />

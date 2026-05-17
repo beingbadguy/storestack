@@ -1,6 +1,5 @@
 import Link from "next/link";
 import React from "react";
-import { BiLogoApple, BiLogoWindows, BiLogoAndroid, BiLogoChrome } from "react-icons/bi";
 
 export default function MinimalContactFooter({ brandName = "Vogue." }) {
   return (
@@ -50,27 +49,13 @@ export default function MinimalContactFooter({ brandName = "Vogue." }) {
 
         {/* Bottom Area */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2 text-sm text-footer-muted font-medium">
-            <div className="w-4 h-4 bg-primary text-primary-text rounded-full flex items-center justify-center text-[10px]">✓</div>
-            Available on all platforms
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-1.5 border border-footer-border rounded-full px-3 py-1.5 text-xs font-medium text-footer-muted">
-              <BiLogoWindows className="text-base" /> Windows
-            </div>
-            <div className="flex items-center gap-1.5 border border-footer-border rounded-full px-3 py-1.5 text-xs font-medium text-footer-muted">
-              <BiLogoApple className="text-base" /> macOS
-            </div>
-            <div className="flex items-center gap-1.5 border border-footer-border rounded-full px-3 py-1.5 text-xs font-medium text-footer-muted">
-              <BiLogoChrome className="text-base" /> Web
-            </div>
-            <div className="flex items-center gap-1.5 border border-footer-border rounded-full px-3 py-1.5 text-xs font-medium text-footer-muted">
-              <BiLogoApple className="text-base" /> iOS
-            </div>
-            <div className="flex items-center gap-1.5 border border-footer-border rounded-full px-3 py-1.5 text-xs font-medium text-footer-muted">
-              <BiLogoAndroid className="text-base" /> Android
-            </div>
+          <p className="text-sm text-footer-muted">
+            © {new Date().getFullYear()} {brandName} Inc. All rights reserved.
+          </p>
+          <div className="flex gap-6">
+            <Link href="#" className="text-sm text-footer-muted hover:text-primary transition-colors font-medium">Terms</Link>
+            <Link href="#" className="text-sm text-footer-muted hover:text-primary transition-colors font-medium">Privacy</Link>
+            <Link href="#" className="text-sm text-footer-muted hover:text-primary transition-colors font-medium">Cookies</Link>
           </div>
         </div>
       </div>

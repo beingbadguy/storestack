@@ -2,7 +2,10 @@ import Link from "next/link";
 import React from "react";
 import { BiUser } from "react-icons/bi";
 
-export default function NewsletterFooter({ brandName = "Vogue." }) {
+export default function NewsletterFooter({ 
+  brandName = "Vogue.",
+  description = "We growing up your lifestyle with premium products. Delivering the best fashion directly to your door."
+}) {
   return (
     <footer className="w-full bg-footer-bg text-footer-text pt-20 font-sans border-t border-footer-border">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -44,7 +47,7 @@ export default function NewsletterFooter({ brandName = "Vogue." }) {
               {brandName}
             </Link>
             <p className="text-footer-muted text-sm leading-relaxed pr-8">
-              We growing up your lifestyle with premium products. Delivering the best fashion directly to your door.
+              {description}
             </p>
           </div>
 

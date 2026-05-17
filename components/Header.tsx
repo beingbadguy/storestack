@@ -14,7 +14,7 @@ import { LiaLinkSolid } from "react-icons/lia";
 import { PiStorefront } from "react-icons/pi";
 
 const Header = () => {
-  const { user, setUser, sellerDomain , setSellerDomain} = useAuthStore();
+  const { user, setUser, sellerDomain, setSellerDomain } = useAuthStore();
   const { toggleSidebar } = useUiStore();
   const router = useRouter();
   const path = usePathname();
@@ -36,7 +36,7 @@ const Header = () => {
         toast.success(response.data.message || "logout successful!");
         setUser(null);
         setSellerDomain(null);
-        
+
         router.push("/login");
       }
 
@@ -47,7 +47,7 @@ const Header = () => {
   };
 
   useEffect(() => {
-    if(sellerDomain){
+    if (sellerDomain) {
       setLiveLink(`http://${sellerDomain}.amancodes.in`);
     } else {
       setLiveLink(null);
@@ -68,7 +68,7 @@ const Header = () => {
     <>
       <header className="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b border-gray-200 bg-white px-6">
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={toggleSidebar}
             className="lg:hidden p-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none"
             aria-label="Toggle Sidebar"
@@ -84,22 +84,22 @@ const Header = () => {
               <PiStorefront
                 onClick={() => window.open(liveLink, '_blank')}
                 className=" text-xl font-medium transition hover:bg-gray-100 cursor-pointer  block md:hidden" />
-<button 
-              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium transition hover:bg-gray-100 cursor-pointer  hidden md:block"
-              onClick={() => window.open(liveLink, '_blank')}
-            >
-              Visit Website 
-            </button>
+              <button
+                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium transition hover:bg-gray-100 cursor-pointer  hidden md:block"
+                onClick={() => window.open(liveLink, '_blank')}
+              >
+                Visit Website
+              </button>
 
 
             </div>
-            
+
           )}
-          <div className="flex items-center gap-2">
-            <button className="text-sm font-medium hidden md:block">
+          <div className="flex items-center gap-2 cursor-pointer " onClick={() => router.push("/settings")}>
+            <button className="text-sm font-medium hidden md:block hover:text-teal-600 transition-colors cursor-pointer">
               {user && `${user.firstName} ${user.lastName}`}
             </button>
-            <BiUser className="text-xl text-gray-700" />
+            <BiUser className="text-xl text-gray-700 hover:text-teal-600 transition-colors" />
           </div>
 
           <button

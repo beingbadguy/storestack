@@ -21,6 +21,8 @@ export type AuthState = {
   sellerDomain: string | null;
   webSettings: any | null;
   setWebSettings: (webSettings: any | null) => void;
+  closeNewsletter: boolean;
+  setCloseNewsletter: (closeNewsletter: boolean) => void;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -36,6 +38,8 @@ export const useAuthStore = create<AuthState>()(
       sellerDomain: null,
       setWebSettings: (webSettings: any | null) => set({ webSettings }),
       webSettings: null,
+      closeNewsletter: false,
+      setCloseNewsletter: (closeNewsletter: boolean) => set({ closeNewsletter }),
     }),
     {
       name: "auth-storage",

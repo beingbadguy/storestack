@@ -77,7 +77,8 @@ export const newsletterThemes = {
 } as const;
 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuthStore } from "@/store/useStore";
 // components/newsletter/NewsletterPreview.tsx
 
 
@@ -98,17 +99,19 @@ export default function NewsletterPreview({
     theme,
     title,
     text,
-    // openNewsletterModal,
-    // setOpenNewsletterModal,
 }: NewsletterPreviewProps) {
+    const [mounted, setMounted] = useState(false);
+    const { closeNewsletter, setCloseNewsletter } = useAuthStore();
 
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
- 
+    const currentTheme = newsletterThemes[theme];
 
-    const currentTheme =
-        newsletterThemes[theme];
-    
-  
+    if (!mounted || closeNewsletter) {
+        return null;
+    }
 
     return (
         <div className=" absolute  inset-0  bg-black/50 z-100  flex items-center justify-center p-4">
@@ -117,8 +120,8 @@ export default function NewsletterPreview({
 
                 {/* Close Button */}
                 <button
-                    className="absolute right-5 top-5 z-20 rounded-full bg-white/90 p-2 text-gray-500 transition hover:bg-gray-100"
-                    // onClick={handleModalClose}
+                    className="absolute right-5 top-5 z-20 rounded-full bg-white/90 p-2 text-gray-500 transition hover:bg-gray-100 cursor-pointer"
+                    onClick={() => setCloseNewsletter(true)}
                 >
                     <BiX size={20}  />
                 </button>

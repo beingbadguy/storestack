@@ -16,6 +16,7 @@ const webSettingsSchema = new mongoose.Schema({
     brandName: { type: String, default: "My Store" },
     websiteTitle: { type: String, default: "Experience Exceptional Shopping" },
     siteDescription: { type: String, default: "Browse premium products and make confident shopping decisions." },
+    websiteDescription: { type: String, default: "Your premium destination for fashion and lifestyle." },
     showSearchbar: { type: Boolean, default: true },
     
     // Theme & Navigation
@@ -65,13 +66,14 @@ const webSettingsSchema = new mongoose.Schema({
     enableNewsletter: { type: Boolean, default: false },
     newsletterText: { type: String, default: "Receive new updates delivered straight to your inbox." },
     newsletterTitle: { type: String, default: "Sign Up For Our Newsletter" },
+   
 
 
 }, { timestamps: true });
 
-// if (process.env.NODE_ENV === "development") {
-//     delete mongoose.models.WebSettings;
-// }
+if (process.env.NODE_ENV === "development") {
+    delete mongoose.models.WebSettings;
+}
 
 const WebSettings = mongoose.models.WebSettings || mongoose.model("WebSettings", webSettingsSchema);
 

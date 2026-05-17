@@ -1,8 +1,10 @@
 import Link from "next/link";
 import React from "react";
-import { BiLogoApple, BiLogoWindows } from "react-icons/bi";
 
-export default function MultiColumnFooter({ brandName = "Vogue." }) {
+export default function MultiColumnFooter({ 
+  brandName = "Vogue.",
+  description = "Your premium destination for fashion and lifestyle."
+}) {
   return (
     <footer className="w-full bg-footer-bg text-footer-text pt-16 font-sans border-t border-footer-border">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 pb-12">
@@ -16,13 +18,13 @@ export default function MultiColumnFooter({ brandName = "Vogue." }) {
               {brandName}
             </Link>
             <p className="text-footer-text text-xl font-medium leading-snug mb-8 pr-4">
-              Your premium destination for fashion and lifestyle.
+              {description}
             </p>
             <p className="text-footer-muted text-sm">{brandName}, {new Date().getFullYear()}.</p>
           </div>
 
           {/* Links Columns */}
-          <div className="md:col-span-8 lg:col-span-6 grid grid-cols-3 gap-8">
+          <div className="md:col-span-8 lg:col-span-5 grid grid-cols-3 gap-8">
             <div>
               <h3 className="text-sm font-semibold text-footer-text mb-4">Shop</h3>
               <ul className="space-y-3">
@@ -55,20 +57,7 @@ export default function MultiColumnFooter({ brandName = "Vogue." }) {
             </div>
           </div>
 
-          {/* App Download */}
-          <div className="md:col-span-12 lg:col-span-2">
-            <h3 className="text-sm font-semibold text-footer-text mb-4">Get the app</h3>
-            <div className="space-y-3">
-              <button className="w-full flex items-center justify-center gap-2 bg-footer-bg border border-footer-border rounded-full py-2 px-4 hover:bg-footer-bg/80 text-footer-text transition-colors cursor-pointer">
-                <BiLogoApple className="text-xl" />
-                <span className="text-sm font-medium">iOS App</span>
-              </button>
-              <button className="w-full flex items-center justify-center gap-2 bg-footer-bg border border-footer-border rounded-full py-2 px-4 hover:bg-footer-bg/80 text-footer-text transition-colors cursor-pointer">
-                <BiLogoWindows className="text-xl" />
-                <span className="text-sm font-medium">Android</span>
-              </button>
-            </div>
-          </div>
+        
         </div>
       </div>
 
