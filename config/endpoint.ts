@@ -4,5 +4,7 @@ export const API_ENDPOINTS = {
   LOGOUT: "/api/logout",
   GET_DOMAIN: "/api/domain",
   DEPLOY_WEBSITE: "/api/deploy",
-  GET_TENANT_DETAIL: "/api/tenant"
+  GET_TENANT_DETAIL: "/api/tenant",
+  UPDATE_WEBSETTINGS: "/api/websettings",
+  GET_WEBSETTINGS: "/api/websettings",
 };

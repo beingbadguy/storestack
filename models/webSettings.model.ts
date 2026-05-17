@@ -7,11 +7,15 @@ const webSettingsSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    sellerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
     // General Information
-    websiteName: { type: String, default: "My E-commerce Store" },
+    brandName: { type: String, default: "My Store" },
     websiteTitle: { type: String, default: "Experience Exceptional Shopping" },
     siteDescription: { type: String, default: "Browse premium products and make confident shopping decisions." },
-    featuredListingsCount: { type: Number, default: 4 },
     showSearchbar: { type: Boolean, default: true },
     
     // Theme & Navigation

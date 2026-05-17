@@ -28,6 +28,29 @@ export async function POST(req: NextRequest) {
     try {
         await connectToDatabase();
         const body = await req.json();
+        console.log(body)
+        const { tenantId, ...updateData } = body;
+
+        if (!tenantId) {
+            return NextResponse.json({ success: false, message: "Tenant ID is required" }, { status: 400 });
+        }
+
+        const settings = await WebSettings.findOneAndUpdate(
+            { tenantId },
+            { $set: updateData },
+            { new: true, upsert: true }
+        );
+
+        return NextResponse.json({ success: true, data: settings, message: "Settings updated successfully" });
+    } catch (error: any) {
+        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    }
+}
+
+export async function PUT(req: NextRequest) {
+    try {
+        await connectToDatabase();
+        const body = await req.json();
         const { tenantId, ...updateData } = body;
 
         if (!tenantId) {

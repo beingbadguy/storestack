@@ -65,6 +65,10 @@ const userSchema = new Schema(
     accessToken: {
       type: String,
     },
+    hasAcceptedCookies: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

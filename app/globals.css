@@ -1,13 +1,87 @@
 @import "tailwindcss";
 
-
 @theme inline {
-
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  --color-primary: var(--theme-primary);
+  --color-primary-hover: var(--theme-hover);
+  --color-primary-text: var(--theme-primary-text);
+  --color-footer-bg: var(--theme-footer);
+  --color-footer-text: var(--theme-footer-text);
+  --color-footer-muted: var(--theme-footer-muted);
+  --color-footer-border: var(--theme-footer-border);
 }
 
+:root {
+  --theme-primary: #0d9488;
+  --theme-hover: #0f766e;
+  --theme-primary-text: #ffffff;
+  --theme-footer: #111827;
+  --theme-footer-text: #f3f4f6;
+  --theme-footer-muted: #9ca3af;
+  --theme-footer-border: #1f2937;
+}
 
+.theme-teal-white {
+  --theme-primary: #0d9488;
+  --theme-hover: #0f766e;
+  --theme-primary-text: #ffffff;
+  --theme-footer: #111827;
+  --theme-footer-text: #f3f4f6;
+  --theme-footer-muted: #9ca3af;
+  --theme-footer-border: #1f2937;
+}
+
+.theme-black-white {
+  --theme-primary: #000000;
+  --theme-hover: #1f2937;
+  --theme-primary-text: #ffffff;
+  --theme-footer: #000000;
+  --theme-footer-text: #f3f4f6;
+  --theme-footer-muted: #9ca3af;
+  --theme-footer-border: #1f2937;
+}
+
+.theme-yellow-white {
+  --theme-primary: #facc15;
+  --theme-hover: #eab308;
+  --theme-primary-text: #000000;
+  --theme-footer: #111827;
+  --theme-footer-text: #f3f4f6;
+  --theme-footer-muted: #9ca3af;
+  --theme-footer-border: #1f2937;
+}
+
+.theme-indigo-slate {
+  --theme-primary: #4f46e5;
+  --theme-hover: #4338ca;
+  --theme-primary-text: #ffffff;
+  --theme-footer: #0f172a;
+  --theme-footer-text: #f1f5f9;
+  --theme-footer-muted: #94a3b8;
+  --theme-footer-border: #1e293b;
+}
+
+.theme-rose-stone {
+  --theme-primary: #e11d48;
+  --theme-hover: #be123c;
+  --theme-primary-text: #ffffff;
+  --theme-footer: #1c1917;
+  --theme-footer-text: #f5f5f4;
+  --theme-footer-muted: #a8a29e;
+  --theme-footer-border: #272522;
+}
+
+.theme-emerald-gray {
+  --theme-primary: #059669;
+  --theme-hover: #047857;
+  --theme-primary-text: #ffffff;
+  --theme-footer: #111827;
+  --theme-footer-text: #f3f4f6;
+  --theme-footer-muted: #9ca3af;
+  --theme-footer-border: #1f2937;
+}
 
 body {
   background: var(--background);

@@ -2,6 +2,45 @@ import { ReactNode } from "react";
 import { connectToDatabase } from "@/config/databaseConnection";
 import Tenant from "@/models/tenant.model";
 import { FiAlertTriangle } from "react-icons/fi";
+import WebSettings from "@/models/webSettings.model";
+import { Metadata } from "next";
+
+
+export async function generateMetadata({
+params
+}: {
+    params: Promise<{ domain: string }>;
+}):Promise<Metadata> {
+    const { domain } = await params;
+    
+    await connectToDatabase();
+    
+    const tenant = await Tenant.findOne({ slug: domain });
+    console.log("tenant in generate", tenant)
+    
+    if (!tenant) {
+        return {
+            title: "Website Not Registered",
+            description: "The website you're trying to access hasn't been registered with our platform yet.",
+        };
+    }
+
+
+    const websiteSettings = await WebSettings.findOne({ tenantId: tenant._id });
+    console.log("websiteSettings in generate", websiteSettings)
+    
+    if (websiteSettings) {
+        return {
+            title: websiteSettings.websiteTitle,
+            description: websiteSettings.siteDescription,
+        };
+    }
+    
+    return {
+          title: "Website Not Registered",
+            description: "The website you're trying to access hasn't been registered with our platform yet.",
+    };
+}
 
 export default async function DomainLayout({
     children,
@@ -15,7 +54,14 @@ export default async function DomainLayout({
     await connectToDatabase();
     
     const tenant = await Tenant.findOne({ slug: domain });
-    
+    console.log("tenant", tenant)
+       let settings = null;
+
+       if (tenant) {
+            settings = await WebSettings.findOne({ tenantId: tenant._id });
+           
+            console.log("settings",settings);
+        }
     if (!tenant) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-[#f8f9fa] p-4 py-12">

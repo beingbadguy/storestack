@@ -8,6 +8,7 @@ import MultiColumnFooter from "@/components/footers/MultiColumnFooter";
 import MinimalContactFooter from "@/components/footers/MinimalContactFooter";
 import CenteredFooter from "@/components/footers/CenteredFooter";
 import NewsletterFooter from "@/components/footers/NewsletterFooter";
+import CookieConsent from "@/components/CookieConsent";
 
 import { connectToDatabase } from "@/config/databaseConnection";
 import Tenant from "@/models/tenant.model";
@@ -19,17 +20,22 @@ export default async function DomainHomePage({ params }: { params: Promise<{ dom
     await connectToDatabase();
     const tenant = await Tenant.findOne({ slug: domain });
     let settings = null;
+    console.log("tenant",tenant)
     
     if (tenant) {
         settings = await WebSettings.findOne({ tenantId: tenant._id });
         if (!settings) {
             settings = await WebSettings.create({ tenantId: tenant._id });
         }
+        console.log("settings",settings);
     }
 
     const navbarLayout = settings?.navbarLayout || "minimal";
     const footerLayout = settings?.footerLayout || "multicolumn";
-    const brandName = settings?.websiteName || domain;
+    let brandName = settings?.brandName || domain;
+    if (brandName.length > 10) {
+        brandName = brandName.substring(0, 10);
+    }
     const theme = settings?.theme || "teal-white";
 
     return (
@@ -56,6 +62,8 @@ export default async function DomainHomePage({ params }: { params: Promise<{ dom
             {footerLayout === "minimalcontact" && <MinimalContactFooter brandName={brandName} />}
             {footerLayout === "centered" && <CenteredFooter brandName={brandName} />}
             {footerLayout === "newsletter" && <NewsletterFooter brandName={brandName} />}
+
+            <CookieConsent settings={settings ? JSON.parse(JSON.stringify(settings)) : null} />
         </div>
     );
 }

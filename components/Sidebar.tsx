@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useUiStore } from "@/store/useUiStore";
 
 import {
   FiHome,
@@ -16,6 +17,7 @@ import {
   FiBarChart2,
   FiMessageCircle,
   FiLayers,
+  FiX,
 } from "react-icons/fi";
 
 import {
@@ -29,6 +31,7 @@ import { BiCategoryAlt, BiLogOut } from "react-icons/bi";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const { setSidebarOpen } = useUiStore();
 
   const menuItems = [
     {
@@ -127,20 +130,30 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="h-screen w-64 bg-white border-r border-gray-200 overflow-y-auto overscroll-contain">
-      {/* LOGO */}
-      <div className="flex items-center justify-center border-b border-gray-200 p-5">
-        <Image
-          src="https://logobook.com/wp-content/uploads/2016/10/Real_Typographers_logo.svg"
-          alt="logo"
-          width={20}
-          height={20}
-          priority
-        />
+    <aside className="h-screen w-full bg-white border-r border-gray-200 overflow-y-auto overscroll-contain flex flex-col">
+      {/* LOGO & CLOSE BUTTON */}
+      <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4.5">
+        <div className="flex items-center gap-2">
+          <Image
+            src="https://logobook.com/wp-content/uploads/2016/10/Real_Typographers_logo.svg"
+            alt="logo"
+            width={20}
+            height={20}
+            priority
+          />
+          <span className="font-semibold text-gray-800 text-sm tracking-wide">STORESTACK</span>
+        </div>
+        <button 
+          onClick={() => setSidebarOpen(false)}
+          className="lg:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+          aria-label="Close Sidebar"
+        >
+          <FiX className="w-5 h-5" />
+        </button>
       </div>
 
       {/* MENU */}
-      <div className="py-4">
+      <div className="py-4 flex-1">
         {menuItems.map((section) => (
           <div key={section.section} className="mb-6">
             <p className="px-6 mb-2 text-xs font-semibold text-gray-400 tracking-widest">
@@ -155,6 +168,7 @@ const Sidebar = () => {
                   <Link
                     key={item.name}
                     href={item.link}
+                    onClick={() => setSidebarOpen(false)}
                     className={`mx-3 flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200
                    
                       ${

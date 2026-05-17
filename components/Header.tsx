@@ -3,14 +3,18 @@
 import { axiosClient } from "@/config/axiosClient";
 import { API_ENDPOINTS } from "@/config/endpoint";
 import { useAuthStore } from "@/store/useStore";
-import { useRouter } from "next/navigation";
+import { useUiStore } from "@/store/useUiStore";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { BiLogOut, BiUser } from "react-icons/bi";
+import { FiMenu } from "react-icons/fi";
 
 const Header = () => {
   const { user, setUser, sellerDomain } = useAuthStore();
+  const { toggleSidebar } = useUiStore();
   const router = useRouter();
+  const path = usePathname();
 
   const [logoutModal, setLogoutModal] = useState<boolean>(false);
   const [liveLink, setLiveLink] = useState<string | null>(null);
@@ -43,13 +47,31 @@ const Header = () => {
     } else {
       setLiveLink(null);
     }
-  },[sellerDomain])
+  }, [sellerDomain]);
 
+  const getPageTitle = (pathname: string) => {
+    if (!pathname) return "Dashboard";
+    const segment = pathname.split("/")[1];
+    if (!segment) return "Dashboard";
+    return segment
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
 
   return (
     <>
       <header className="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b border-gray-200 bg-white px-6">
-        <div className="text-lg font-semibold">Dashboard</div>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={toggleSidebar}
+            className="lg:hidden p-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none"
+            aria-label="Toggle Sidebar"
+          >
+            <FiMenu className="w-6 h-6" />
+          </button>
+          <div className="md:text-lg font-semibold">{getPageTitle(path)}</div>
+        </div>
 
         <div className="flex items-center gap-4">
           {liveLink && (
@@ -60,11 +82,12 @@ const Header = () => {
               View Live Website
             </button>
           )}
-          <button className="text-sm font-medium">
-            {user && `${user.firstName} ${user.lastName}`}
-          </button>
-
-          <BiUser className="text-xl" />
+          <div className="flex items-center gap-2">
+            <button className="text-sm font-medium hidden md:block">
+              {user && `${user.firstName} ${user.lastName}`}
+            </button>
+            <BiUser className="text-xl text-gray-700" />
+          </div>
 
           <button
             onClick={() => setLogoutModal(true)}
