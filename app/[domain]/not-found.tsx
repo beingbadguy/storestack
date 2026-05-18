@@ -27,7 +27,7 @@ export default function NotFound() {
             <FiAlertTriangle className="text-orange-500 text-3xl" />
           </div>
           <h1 className="text-lg font-medium mb-1">Page Not Found</h1>
-          <p className="text-orange-50 text-sm">
+          <p className="text-orange-50 text-sm text-center">
             The page you're looking for doesn't exist
           </p>
         </div>

@@ -4,6 +4,7 @@ import WebSettings from "@/models/webSettings.model";
 import NewsletterModal from "@/components/NewsletterModal";
 import Hydrator from "@/components/Hydator";
 import Faq from "@/components/Faq";
+import HeroSection from "@/components/HeroSection";
 
 export default async function DomainHomePage({
   params,
@@ -35,19 +36,13 @@ export default async function DomainHomePage({
     <div className={`flex flex-col  bg-gray-50 theme-${theme}`}>
       <Hydrator settings={settingsData} />
 
-      <div className="flex-grow">
-        <div className="flex flex-col items-center justify-center py-32 text-center px-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            {settings?.websiteTitle || "Experience Exceptional Shopping"}
-          </h1>
-          <p className="text-gray-500 max-w-2xl text-lg">
-            {settings?.siteDescription ||
-              "Browse premium products and make confident shopping decisions."}
-          </p>
-        </div>
-      </div>
+      {/* hero section  */}
+      <HeroSection />
+
+      {/* faq */}
       <Faq />
 
+      {/* newsletter  */}
       {settings?.enableNewsletter && (
         <NewsletterModal
           theme={theme}

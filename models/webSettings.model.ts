@@ -32,7 +32,8 @@ const webSettingsSchema = new mongoose.Schema(
       type: String,
       default: "Your premium destination for fashion and lifestyle.",
     },
-    showSearchbar: { type: Boolean, default: true },
+
+    // showSearchbar: { type: Boolean, default: true },
 
     // Theme & Navigation
     theme: { type: String, default: "teal-white" },
@@ -44,6 +45,9 @@ const webSettingsSchema = new mongoose.Schema(
     footerLogo: { type: String, default: "" },
     siteLogoLight: { type: String, default: "" },
     siteLogoDark: { type: String, default: "" },
+
+    // hero section info
+    isBannerEnabled: { type: Boolean, default: false },
     bannerType: {
       type: String,
       enum: ["image", "videobackground", "slider"],
@@ -52,8 +56,6 @@ const webSettingsSchema = new mongoose.Schema(
     videoBackgroundLink: { type: String, default: "" },
     bannerImage: { type: String, default: "" },
     videoBackground: { type: String, default: "" },
-    navbarBackgroundImage: { type: String, default: "" },
-    footerBackgroundImage: { type: String, default: "" },
     sliderImages: [{ type: String }],
 
     // Contact Information

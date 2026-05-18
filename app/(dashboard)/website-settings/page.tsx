@@ -38,8 +38,21 @@ import {
   FiTrash2,
   FiEdit,
 } from "react-icons/fi";
-import { BiCross, BiSearch, BiX } from "react-icons/bi";
-import { PiImageSquareThin } from "react-icons/pi";
+import {
+  BiCross,
+  BiImage,
+  BiImageAdd,
+  BiSearch,
+  BiUpload,
+  BiX,
+} from "react-icons/bi";
+import { PiImageSquareThin, PiUploadSimpleThin } from "react-icons/pi";
+import { div } from "framer-motion/client";
+import Image from "next/image";
+import { AiOutlineDelete } from "react-icons/ai";
+import { LiaCloudUploadAltSolid } from "react-icons/lia";
+import { singlePhotoUpload } from "@/common/singlePhotoUpload";
+import Loader from "@/components/Loader";
 
 type TabId =
   | "general"
@@ -113,6 +126,50 @@ export default function WebsiteSettingsPage() {
   const [question, setQuestion] = useState<string>("");
   const [answer, setAnswer] = useState<string>("");
   const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [singleBannerImage, setSingleBannerImage] = useState<File | null>(null);
+  const [singleBannerPreview, setSingleBannerPreview] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleBannerImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (file && file?.size > 5 * 1024 * 1024) {
+      toast.error("File size should be less than 5MB.");
+      return;
+    }
+    setSingleBannerImage(file as File);
+  };
+
+  useEffect(() => {
+    if (!singleBannerImage) return;
+    const objectUrl = URL.createObjectURL(singleBannerImage);
+    setSingleBannerPreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [singleBannerImage]);
+
+  const singleBannerUpload = async () => {
+    try {
+      setIsLoading(true);
+      if (!singleBannerImage) {
+        toast.error("Please Select an image to upload");
+        return;
+      }
+      const imageLink = await singlePhotoUpload(singleBannerImage);
+      if (imageLink) {
+        console.log(imageLink);
+        const newSettings = { ...settings, bannerImage: imageLink };
+        setSettings(newSettings);
+        saveWebSettings(newSettings);
+        setSingleBannerPreview("");
+        setSingleBannerImage(null);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const saveFaq = async () => {
     console.log("Saving FAQ:", { question, answer });
@@ -121,6 +178,7 @@ export default function WebsiteSettingsPage() {
       return;
     }
     try {
+      setIsLoading(true);
       const response = await axiosClient.post(API_ENDPOINTS.ADD_FAQ, {
         tenantId: tenantId,
         question,
@@ -135,6 +193,8 @@ export default function WebsiteSettingsPage() {
       getWebSettings(tenantId);
     } catch (e) {
       console.log(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -144,6 +204,7 @@ export default function WebsiteSettingsPage() {
       return;
     }
     try {
+      setIsLoading(true);
       const response = await axiosClient.delete(API_ENDPOINTS.DELETE_FAQ, {
         data: {
           tenantId,
@@ -158,6 +219,8 @@ export default function WebsiteSettingsPage() {
     } catch (error) {
       console.log(error);
       toast.error("Failed to delete FAQ.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -171,7 +234,8 @@ export default function WebsiteSettingsPage() {
     footerLogo: "",
     siteLogoLight: "",
     siteLogoDark: "",
-    bannerType: "videobackground",
+    isBannerEnabled: false,
+    bannerType: "image",
     videoBackgroundLink: "",
     bannerImage: "",
     videoBackground: "",
@@ -205,6 +269,7 @@ export default function WebsiteSettingsPage() {
 
   const checkDomain = async (slug: string) => {
     try {
+      setIsLoading(true);
       const response = await axiosClient.get(API_ENDPOINTS.GET_DOMAIN, {
         params: {
           domain: slug,
@@ -213,11 +278,14 @@ export default function WebsiteSettingsPage() {
       setIsDomainAvailable(response.data.success);
     } catch (error: any) {
       setIsDomainAvailable(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const deployWebsite = async () => {
     try {
+      setIsLoading(true);
       const response = await axiosClient.post(API_ENDPOINTS.DEPLOY_WEBSITE, {
         slug: domain,
         userId: user?.userId,
@@ -228,11 +296,14 @@ export default function WebsiteSettingsPage() {
       isTenantLive();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to deploy website");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const getWebSettings = async (tId: string) => {
     try {
+      setIsLoading(true);
       const response = await axiosClient.get(API_ENDPOINTS.GET_WEBSETTINGS, {
         params: {
           tenantId: tId,
@@ -261,6 +332,8 @@ export default function WebsiteSettingsPage() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -270,6 +343,7 @@ export default function WebsiteSettingsPage() {
       return;
     }
     try {
+      setIsLoading(true);
       const res = await axiosClient.get(API_ENDPOINTS.GET_TENANT_DETAIL, {
         params: {
           sellerId: user?.userId,
@@ -289,23 +363,26 @@ export default function WebsiteSettingsPage() {
       }
     } catch (error: any) {
       console.log(error.response?.data);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const saveWebSettings = async () => {
+  const saveWebSettings = async (customSettings = settings) => {
     if (!tenantId) {
       toast.error("Please deploy a website domain first.");
       return;
     }
-    if (!settings?.cookieText) {
+    if (!customSettings?.cookieText) {
       setCookieError("Please add cookie text.");
       return;
     }
     setCookieError("");
+    setIsLoading(true);
     const updatePromise = axiosClient.post(API_ENDPOINTS.UPDATE_WEBSETTINGS, {
       tenantId: tenantId,
       sellerId: user?.userId,
-      ...settings,
+      ...customSettings,
 
       theme: selectedTheme,
     });
@@ -320,6 +397,8 @@ export default function WebsiteSettingsPage() {
       await updatePromise;
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -342,6 +421,7 @@ export default function WebsiteSettingsPage() {
 
   return (
     <div className="w-full pb-10">
+      <Loader isLoading={isLoading} />
       {/* Header section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
         <div className="flex items-center gap-4">
@@ -359,7 +439,7 @@ export default function WebsiteSettingsPage() {
         </div>
         <button
           className="mt-4 md:mt-0 px-5 py-2.5 bg-teal-600 text-white rounded-lg flex items-center gap-2 hover:bg-teal-700 transition-colors shadow-sm font-medium text-sm cursor-pointer text-center self-start lg:self-end"
-          onClick={saveWebSettings}
+          onClick={() => saveWebSettings(settings)}
         >
           <FiSave className="w-4 h-4" />
           Save Changes
@@ -649,6 +729,158 @@ export default function WebsiteSettingsPage() {
             {/* </div>
             </div> */}
 
+            {/* Banner & Media  */}
+            <div>
+              <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-200">
+                <FiImage className="w-5 h-5" />
+                <h2 className="text-base font-semibold">Banner & Media</h2>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-xs font-bold   uppercase tracking-wider text-gray-500">
+                  Enable Banner
+                </span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.isBannerEnabled}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        isBannerEnabled: e.target.checked,
+                      })
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
+                </label>
+              </div>
+
+              {settings.isBannerEnabled && (
+                <div className="my-2 flex-1 md:max-w-md">
+                  <label className=" block text-xs font-bold   uppercase tracking-wider text-gray-500 mb-1.5 ">
+                    Banner Type
+                  </label>
+                  <select
+                    name=""
+                    id=""
+                    value={settings.bannerType}
+                    onChange={(e) =>
+                      setSettings({ ...settings, bannerType: e.target.value })
+                    }
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm bg-white cursor-pointer"
+                  >
+                    <option value="image">Image</option>
+                    <option value="slider">Slider</option>
+                    <option value="video">Video</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+              )}
+
+              {settings.isBannerEnabled && settings.bannerType === "image" && (
+                <div className="my-2 ">
+                  <label className=" block text-xs font-bold   uppercase tracking-wider text-gray-500 mb-1.5">
+                    Banner Image
+                  </label>
+
+                  {settings?.bannerImage && !singleBannerImage ? (
+                    <div className="relative">
+                      <Image
+                        src={settings.bannerImage}
+                        alt="Single Banner Image"
+                        width={600}
+                        height={200}
+                        className="mt-4 rounded-lg object-cover border w-full h-[300px]"
+                      />
+                      <div className="flex items-center gap-3 my-3 ">
+                        <button
+                          onClick={() => {
+                            setSettings({ ...settings, bannerImage: "" });
+                          }}
+                          className="p-3  border border-red-200 bg-red-50 text-red-500 text-lg font-medium hover:bg-red-100 transition absolute -top-2 -right-3 rounded-full cursor-pointer"
+                        >
+                          <AiOutlineDelete />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    settings?.bannerType === "image" &&
+                    !singleBannerImage && (
+                      <div className="relative h-32 w-full overflow-hidden rounded-xl border border-dashed border-gray-300 cursor-pointer hover:border-teal-400 transition-all bg-gray-50">
+                        {/* Hidden Native Input Layer */}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleBannerImageChange}
+                          className="absolute inset-0 z-10 opacity-0 cursor-pointer"
+                        />
+
+                        {/* UI Layer */}
+                        <div className="flex h-full w-full flex-col items-center justify-center gap-2 pointer-events-none">
+                          <BiImageAdd className="text-gray-300 size-8" />
+
+                          <p className="text-xs font-medium text-gray-400">
+                            Click to upload banner
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  )}
+
+                  {settings.bannerType === "image" && singleBannerImage && (
+                    <div className="relative">
+                      <Image
+                        src={singleBannerPreview}
+                        alt="Banner Preview"
+                        width={600}
+                        height={200}
+                        className="mt-4 rounded-lg object-cover border w-full h-[300px]"
+                      />
+                      <div className="flex items-center gap-3 my-3 ">
+                        <button
+                          className="px-4 py-2 rounded-lg bg-teal-500 text-white font-medium hover:bg-teal-600 transition  flex items-center gap-1 justify-center cursor-pointer text-md"
+                          onClick={singleBannerUpload}
+                        >
+                          <LiaCloudUploadAltSolid className="" /> Upload
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setSingleBannerImage(null);
+                            setSingleBannerPreview("");
+                          }}
+                          className="p-3  border border-red-200 bg-red-50 text-red-500 text-lg font-medium hover:bg-red-100 transition absolute -top-2 -right-3 rounded-full cursor-pointer"
+                        >
+                          <AiOutlineDelete />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {/* <div className="flex items-center gap-4">
+                    <div className="w-32 h-16 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
+                      {settings.bannerImage ? (
+                        <img
+                          src={settings.bannerImage}
+                          alt="Banner"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xs text-gray-400 font-medium flex items-center gap-1">
+                          <FiImage className="w-3 h-3" /> No Image
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      className="px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium transition-colors"
+                      // onClick={() => setOpen(true)}
+                    >
+                      <FiUpload className="w-4 h-4" /> Upload
+                    </button>
+                  </div> */}
+                </div>
+              )}
+            </div>
+
             {/* Legal & Compliance */}
             <div>
               <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-200">
@@ -665,7 +897,6 @@ export default function WebsiteSettingsPage() {
                   <input
                     type="checkbox"
                     checked={settings.enableCookieConsent}
-                    defaultChecked={settings.enableCookieConsent || false}
                     onChange={(e) =>
                       setSettings({
                         ...settings,
@@ -1354,7 +1585,7 @@ export default function WebsiteSettingsPage() {
                   </label>
                   <input
                     type="text"
-                    className="mt-1 block border w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm p-3"
+                    className="mt-1 block border w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm p-3 focus:ring-1  focus:outline-none"
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                   />
@@ -1365,7 +1596,7 @@ export default function WebsiteSettingsPage() {
                   </label>
                   <textarea
                     cols={3}
-                    className="mt-1 block w-full border rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm p-3 "
+                    className="mt-1 block w-full border rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm p-3 focus:ring-1  focus:outline-none"
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
                   />

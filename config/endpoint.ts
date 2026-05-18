@@ -9,4 +9,5 @@ export const API_ENDPOINTS = {
   GET_WEBSETTINGS: "/api/websettings",
   ADD_FAQ: "/api/faq",
   DELETE_FAQ: "/api/faq",
+  UPLOAD_IMAGE: "/api/single-image-upload",
 };

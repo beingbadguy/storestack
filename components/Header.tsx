@@ -23,7 +23,7 @@ const Header = () => {
   const [liveLink, setLiveLink] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("User in header:", user);
+    // console.log("User in header:", user);
   }, [user]);
 
   const handleLogout = async () => {

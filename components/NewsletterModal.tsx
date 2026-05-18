@@ -145,7 +145,7 @@ export default function NewsletterPreview({
         </div>
 
         {/* Content */}
-        <div className="px-8 pb-10 pt-20 text-center">
+        <div className="px-8 pb-10 pt-10 md:pt-20 text-center">
           <h2 className="text-xl md:text-3xl font-bold leading-tight tracking-tight text-gray-900">
             {title || "Sign Up For Our Newsletter"}
           </h2>
