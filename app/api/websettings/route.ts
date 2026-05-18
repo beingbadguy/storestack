@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
         await connectToDatabase();
         const url = new URL(req.url);
         const tenantId = url.searchParams.get("tenantId");
-        console.log(tenantId, " tenantId")
+        // console.log(tenantId, " tenantId")
 
         if (!tenantId) {
             return NextResponse.json({ success: false, message: "Tenant ID is required" }, { status: 400 });
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
         let settings = await WebSettings.findOne({ tenantId });
 
-        console.log("Web Settings fetched:", settings);
+        // console.log("Web Settings fetched:", settings);
         
         if (!settings) {
             settings = await WebSettings.create({ tenantId });
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     try {
         await connectToDatabase();
         const body = await req.json();
-        console.log(body)
+        // console.log(body)
         const { tenantId, ...updateData } = body;
 
         if (!tenantId) {

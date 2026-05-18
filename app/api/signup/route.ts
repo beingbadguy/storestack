@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
       },
     );
 
-    console.log("==THIS IS THE NEW RESPONSE==", NextResponse);
+    // console.log("==THIS IS THE NEW RESPONSE==", NextResponse);
     await createTokenAndSetCookie(newUser, res);
     return res;
   } catch (error) {

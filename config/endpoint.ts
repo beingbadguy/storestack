@@ -7,4 +7,6 @@ export const API_ENDPOINTS = {
   GET_TENANT_DETAIL: "/api/tenant",
   UPDATE_WEBSETTINGS: "/api/websettings",
   GET_WEBSETTINGS: "/api/websettings",
+  ADD_FAQ: "/api/faq",
+  DELETE_FAQ: "/api/faq",
 };
