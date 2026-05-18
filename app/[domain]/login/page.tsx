@@ -1,8 +1,8 @@
 export default async function DomainLoginPage({ params }: { params: Promise<{ domain: string }> }) {
     const { domain } = await params;
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-10 border border-gray-100">
+        <div className="flex min-h-[70vh] items-center justify-center bg-gray-50 p-4">
+            <div className="w-full max-w-md  rounded-2xl  md:p-10 border border-gray-100">
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Welcome Back</h1>
                     <p className="text-gray-500 mt-2 text-sm font-medium">Sign in to your <span className="text-black font-semibold uppercase">{domain}</span> account</p>
