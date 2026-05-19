@@ -1,8 +1,13 @@
 "use client";
 
+import Loader from "@/components/Loader";
+import { axiosClient } from "@/config/axiosClient";
+import { API_ENDPOINTS } from "@/config/endpoint";
+import { useAuthStore } from "@/store/useStore";
+import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FiPlus,
   FiSearch,
@@ -28,58 +33,16 @@ type Category = {
 };
 
 export default function CategoriesPage() {
+  const { webSettings } = useAuthStore();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null,
   );
+  const [page, setPage] = useState(1);
 
-  const [categories, setCategories] = useState<Category[]>([
-    {
-      _id: "1",
-      name: "Electronics",
-      slug: "electronics",
-      image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
-      parentCategory: "-",
-      productCount: 124,
-      isFeatured: true,
-      isActive: true,
-      createdAt: "16 Jul 2026",
-    },
-    {
-      _id: "2",
-      name: "Smart Phones",
-      slug: "smart-phones",
-      image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97",
-      parentCategory: "Electronics",
-      productCount: 54,
-      isFeatured: false,
-      isActive: true,
-      createdAt: "14 Jul 2026",
-    },
-    {
-      _id: "3",
-      name: "Fashion",
-      slug: "fashion",
-      image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8",
-      parentCategory: "-",
-      productCount: 82,
-      isFeatured: true,
-      isActive: false,
-      createdAt: "10 Jul 2026",
-    },
-    {
-      _id: "4",
-      name: "Home Decor",
-      slug: "home-decor",
-      image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
-      parentCategory: "-",
-      productCount: 37,
-      isFeatured: false,
-      isActive: true,
-      createdAt: "08 Jul 2026",
-    },
-  ]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   // Toggle Status
   const toggleStatus = (id: string) => {
@@ -109,9 +72,56 @@ export default function CategoriesPage() {
     );
   };
 
+  const fetchCategories = async () => {
+    const tenantId = webSettings?.tenantId;
+    console.log("Fetching categories for tenantId:", tenantId);
+    setLoading(true);
+    try {
+      const res = await axiosClient.get(API_ENDPOINTS.GET_CATEGORIES, {
+        params: {
+          tenantId: webSettings?.tenantId,
+          page,
+          limit: 10,
+        },
+      });
+      console.log(res.data);
+      if (res.data.success) {
+        setCategories(res.data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [page, webSettings?.tenantId]);
+
+  const handleCategoryDelete = async () => {
+    console.log("Deleting category with ID:", selectedCategory?._id);
+    setLoading(true);
+    try {
+      const res = await axiosClient.delete(
+        API_ENDPOINTS.DELETE_CATEGORY(selectedCategory!._id),
+      );
+      console.log(res.data);
+      if (res.data.success) {
+        setOpenDeleteModal(false);
+        fetchCategories();
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 md:p-6">
       {/* Header */}
+      <Loader isLoading={loading} />
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
@@ -240,14 +250,6 @@ export default function CategoriesPage() {
                 </th>
 
                 <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Slug
-                </th>
-
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Parent
-                </th>
-
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Products
                 </th>
 
@@ -300,16 +302,6 @@ export default function CategoriesPage() {
                   </td>
 
                   {/* Slug */}
-                  <td className="px-6 py-5">
-                    <span className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700">
-                      /{category.slug}
-                    </span>
-                  </td>
-
-                  {/* Parent */}
-                  <td className="px-6 py-5 text-sm font-medium text-gray-700">
-                    {category.parentCategory}
-                  </td>
 
                   {/* Products */}
                   <td className="px-6 py-5">
@@ -356,7 +348,10 @@ export default function CategoriesPage() {
 
                   {/* Created */}
                   <td className="px-6 py-5 text-sm text-gray-500">
-                    {category.createdAt}
+                    {format(
+                      new Date(category.createdAt),
+                      "dd MMM yyyy • hh:mm a",
+                    )}
                   </td>
 
                   {/* Actions */}
@@ -365,7 +360,7 @@ export default function CategoriesPage() {
                       {/* Edit */}
                       <Link
                         href={`/dashboard/categories/edit/${category._id}`}
-                        className="flex h-10 w-10 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-600 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-600"
+                        className="flex h-10 w-10 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-600 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-600 cursor-pointer"
                       >
                         <FiEdit2 className="size-4" />
                       </Link>
@@ -376,7 +371,7 @@ export default function CategoriesPage() {
                           setSelectedCategory(category);
                           setOpenDeleteModal(true);
                         }}
-                        className="flex h-10 w-10 items-center justify-center rounded-2xl border border-red-100 bg-red-50 text-red-500 transition hover:bg-red-100"
+                        className="flex h-10 w-10 items-center justify-center rounded-2xl border border-red-100 bg-red-50 text-red-500 transition hover:bg-red-100 cursor-pointer"
                       >
                         <FiTrash2 className="size-4" />
                       </button>
@@ -414,15 +409,15 @@ export default function CategoriesPage() {
       {openDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-red-50 text-red-500">
-              <FiAlertTriangle className="size-7" />
+            <div className="flex size-10 md:size-14 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+              <FiAlertTriangle className="size-4 md:size-7" />
             </div>
 
-            <h2 className="mt-5 text-2xl font-bold text-gray-900">
+            <h2 className="mt-5 md:text-2xl font-bold text-gray-900">
               Delete Category
             </h2>
 
-            <p className="mt-3 text-sm leading-6 text-gray-500">
+            <p className="mt-1 md:mt-3 text-xs md:text-sm leading-6 text-gray-500">
               Are you sure you want to delete{" "}
               <span className="font-semibold text-gray-900">
                 {selectedCategory?.name}
@@ -433,12 +428,15 @@ export default function CategoriesPage() {
             <div className="mt-8 flex items-center gap-3">
               <button
                 onClick={() => setOpenDeleteModal(false)}
-                className="h-12 flex-1 rounded-2xl border border-gray-200 bg-white text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                className=" h-8 md:h-12 flex-1 rounded-2xl border border-gray-200 bg-white text-sm font-medium text-gray-700 transition hover:bg-gray-50 cursor-pointer"
               >
                 Cancel
               </button>
 
-              <button className="h-12 flex-1 rounded-2xl bg-red-500 text-sm font-medium text-white transition hover:bg-red-600">
+              <button
+                className=" h-8 md:h-12 flex-1 rounded-2xl bg-red-500 text-sm font-medium text-white transition hover:bg-red-600 cursor-pointer"
+                onClick={handleCategoryDelete}
+              >
                 Delete
               </button>
             </div>

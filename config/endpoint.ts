@@ -10,4 +10,12 @@ export const API_ENDPOINTS = {
   ADD_FAQ: "/api/faq",
   DELETE_FAQ: "/api/faq",
   UPLOAD_IMAGE: "/api/single-image-upload",
+  GET_CATEGORIES: "/api/category",
+  ADD_CATEGORY: "/api/category",
+  // UPDATE_CATEGORY: "/api/category",
+  // DELETE_CATEGORY: "/api/category",
+  GENERATE_DESCRIPTION: "/api/generate-description",
+  DELETE_CATEGORY: (id: string) => `/api/category/${id}`,
+  UPDATE_CATEGORY: (id: string) => `/api/category/${id}`,
+  GET_CATEGORY: (id: string) => `/api/category/${id}`,
 };

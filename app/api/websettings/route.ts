@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
         await connectToDatabase();
         const url = new URL(req.url);
         const tenantId = url.searchParams.get("tenantId");
-        // console.log(tenantId, " tenantId")
+        console.log(tenantId, " tenantId")
 
         if (!tenantId) {
             return NextResponse.json({ success: false, message: "Tenant ID is required" }, { status: 400 });

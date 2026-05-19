@@ -14,7 +14,8 @@ import { LiaLinkSolid } from "react-icons/lia";
 import { PiStorefront } from "react-icons/pi";
 
 const Header = () => {
-  const { user, setUser, sellerDomain, setSellerDomain } = useAuthStore();
+  const { user, setUser, sellerDomain, setSellerDomain, setWebSettings } =
+    useAuthStore();
   const { toggleSidebar } = useUiStore();
   const router = useRouter();
   const path = usePathname();
@@ -45,6 +46,30 @@ const Header = () => {
       console.error(error);
     }
   };
+
+  const fetchWebSettings = async () => {
+    try {
+      console.log(user?.userId);
+
+      const response = await axiosClient.get(
+        `${API_ENDPOINTS.GET_WEBSETTINGS}?tenantId=${user?.userId}`,
+      );
+
+      if (response?.data?.success) {
+        const settings = response.data.data;
+        console.log("Web Settings in Header:", settings);
+        setWebSettings(settings);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.userId) {
+      fetchWebSettings();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (sellerDomain) {
@@ -82,20 +107,21 @@ const Header = () => {
           {liveLink && (
             <div>
               <PiStorefront
-                onClick={() => window.open(liveLink, '_blank')}
-                className=" text-xl font-medium transition hover:bg-gray-100 cursor-pointer  block md:hidden" />
+                onClick={() => window.open(liveLink, "_blank")}
+                className=" text-xl font-medium transition hover:bg-gray-100 cursor-pointer  block md:hidden"
+              />
               <button
                 className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium transition hover:bg-gray-100 cursor-pointer  hidden md:block"
-                onClick={() => window.open(liveLink, '_blank')}
+                onClick={() => window.open(liveLink, "_blank")}
               >
                 Visit Website
               </button>
-
-
             </div>
-
           )}
-          <div className="flex items-center gap-2 cursor-pointer " onClick={() => router.push("/settings")}>
+          <div
+            className="flex items-center gap-2 cursor-pointer "
+            onClick={() => router.push("/settings")}
+          >
             <button className="text-sm font-medium hidden md:block hover:text-teal-600 transition-colors cursor-pointer">
               {user && `${user.firstName} ${user.lastName}`}
             </button>
