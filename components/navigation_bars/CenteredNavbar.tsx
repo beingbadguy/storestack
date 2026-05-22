@@ -1,7 +1,14 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
-import { BiMenu, BiX, BiShoppingBag, BiSearch, BiHeart, BiUser } from "react-icons/bi";
+import React, { useEffect, useState } from "react";
+import {
+  BiMenu,
+  BiX,
+  BiShoppingBag,
+  BiSearch,
+  BiHeart,
+  BiUser,
+} from "react-icons/bi";
 
 interface CenteredNavbarProps {
   brandName?: string;
@@ -20,20 +27,40 @@ export default function CenteredNavbar({
 }: CenteredNavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
+
   return (
     <nav className="w-full bg-white border-b border-gray-200">
       {/* Top Banner (Optional, very common in ecommerce) */}
-      <div className="bg-black text-white text-xs font-medium text-center py-2 tracking-wide">
-        FREE SHIPPING ON ALL ORDERS OVER $100
+      <div
+        className={`bg-primary text-white text-xs font-medium text-center py-2 tracking-wide`}
+      >
+        New Arrivals Just Dropped
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-4 ">
         <div className="flex justify-between items-center h-20">
-          
           {/* Mobile Menu & Search (Left side) */}
-          <div className="flex items-center flex-1 md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="p-2 -ml-2 text-gray-800 transition-transform duration-200 active:scale-95">
-              {isOpen ? <BiX className="h-6 w-6 transition-transform duration-300 rotate-90" /> : <BiMenu className="h-6 w-6 transition-transform duration-300" />}
+          <div className="flex items-center flex-1 xl:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 -ml-2 text-gray-800 transition-transform duration-200 active:scale-95"
+            >
+              {isOpen ? (
+                <BiX className="h-6 w-6 transition-transform duration-300 rotate-90" />
+              ) : (
+                <BiMenu className="h-6 w-6 transition-transform duration-300" />
+              )}
             </button>
             <button className="p-2 ml-2 text-gray-800 transition-all duration-200 hover:scale-110 active:scale-95">
               <BiSearch className="h-5 w-5" />
@@ -41,7 +68,7 @@ export default function CenteredNavbar({
           </div>
 
           {/* Desktop Links (Left side) */}
-          <div className="hidden md:flex items-center space-x-6 flex-1">
+          <div className="hidden xl:flex items-center space-x-6 flex-1">
             {links.map((link, idx) => (
               <Link
                 key={idx}
@@ -55,14 +82,17 @@ export default function CenteredNavbar({
 
           {/* Logo (Center) */}
           <div className="flex-shrink-0 flex items-center justify-center">
-            <Link href="/" className="text-3xl font-serif italic tracking-tight text-gray-900 transition-transform duration-200 hover:scale-105">
+            <Link
+              href="/"
+              className="text-3xl font-serif italic tracking-tight text-gray-900 transition-transform duration-200 hover:scale-105"
+            >
               {brandName}
             </Link>
           </div>
 
           {/* Icons (Right side) */}
           <div className="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
-            <button className="hidden md:block text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95">
+            <button className="hidden xl:block text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95">
               <BiSearch className="h-5 w-5" />
             </button>
             <button className="hidden sm:block text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95">
@@ -82,8 +112,10 @@ export default function CenteredNavbar({
       </div>
 
       {/* Mobile Menu */}
-      <div className={`md:hidden bg-white border-t border-gray-100 absolute w-full z-50 transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[450px] opacity-100 visible' : 'max-h-0 opacity-0 invisible overflow-hidden'}`}>
-        <div className="px-4 py-6 space-y-4 shadow-xl">
+      <div
+        className={`xl:hidden  min-h-screen bg-white border-t border-gray-100 absolute w-full z-50 transition-all duration-300 ease-in-out ${isOpen ? "translate-x-0 " : "-translate-x-full overflow-hidden"}`}
+      >
+        <div className="px-4 py-6 space-y-4 ">
           {links.map((link, idx) => (
             <Link
               key={idx}
@@ -94,15 +126,21 @@ export default function CenteredNavbar({
               {link.label}
             </Link>
           ))}
-          <div className="pt-6 mt-6 border-t border-gray-200 grid grid-cols-2 gap-4">
-             <Link href="/account" className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-gray-100">
-                <BiUser className="h-6 w-6 mb-2 transition-colors duration-200" />
-                Account
-             </Link>
-             <Link href="/wishlist" className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-gray-100">
-                <BiHeart className="h-6 w-6 mb-2 transition-colors duration-200" />
-                Wishlist
-             </Link>
+          <div className="pt-6 mt-6 border-t border-gray-300 grid grid-cols-2 gap-4">
+            <Link
+              href="/account"
+              className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-gray-100"
+            >
+              <BiUser className="h-6 w-6 mb-2 transition-colors duration-200" />
+              Account
+            </Link>
+            <Link
+              href="/wishlist"
+              className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-gray-100"
+            >
+              <BiHeart className="h-6 w-6 mb-2 transition-colors duration-200" />
+              Wishlist
+            </Link>
           </div>
         </div>
       </div>

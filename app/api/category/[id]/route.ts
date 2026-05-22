@@ -174,10 +174,11 @@ export async function PATCH(
       );
     }
 
+    
+
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
       {
-        tenantId,
         name,
         description,
         image,

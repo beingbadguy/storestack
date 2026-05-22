@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiMenu, BiX, BiShoppingBag, BiSearch, BiUser, BiGlobe } from "react-icons/bi";
 
 export default function DoubleNavbar({
@@ -14,6 +14,18 @@ export default function DoubleNavbar({
   ],
 }) {
   const [isOpen, setIsOpen] = useState(false);
+
+   useEffect(() => {
+      if (isOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "auto";
+      }
+  
+      return () => {
+        document.body.style.overflow = "auto";
+      };
+    }, [isOpen]);
 
   return (
     <header className="w-full bg-white relative z-50">
@@ -37,7 +49,7 @@ export default function DoubleNavbar({
           <div className="flex justify-between items-center h-16">
             
             <div className="flex items-center">
-              <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-gray-800 p-2 -ml-2 mr-2 transition-transform duration-200 active:scale-95">
+              <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden text-gray-800 p-2 -ml-2 mr-2 transition-transform duration-200 active:scale-95">
                 {isOpen ? <BiX className="h-6 w-6 transition-transform duration-300 rotate-90" /> : <BiMenu className="h-6 w-6 transition-transform duration-300" />}
               </button>
               <Link href="/" className="text-2xl font-bold tracking-tight text-gray-900 transition-transform duration-200 hover:scale-105">
@@ -45,7 +57,7 @@ export default function DoubleNavbar({
               </Link>
             </div>
 
-            <div className="hidden md:flex items-center space-x-6">
+            <div className="hidden lg:flex items-center space-x-6">
               {links.map((link, idx) => (
                 <Link
                   key={idx}
@@ -74,7 +86,7 @@ export default function DoubleNavbar({
       </nav>
 
       {/* Mobile Menu */}
-      <div className={`md:hidden absolute w-full bg-white border-b border-gray-200 shadow-xl transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[400px] opacity-100 visible' : 'max-h-0 opacity-0 invisible overflow-hidden'}`}>
+      <div className={`lg:hidden absolute w-full bg-white border-b border-gray-200 shadow-xl transition-all duration-300 ease-in-out ${isOpen ? ' translate-x-0' : ' translate-x-[-100%] overflow-hidden'}`}>
         <div className="px-4 py-2 space-y-1">
           {links.map((link, idx) => (
             <Link

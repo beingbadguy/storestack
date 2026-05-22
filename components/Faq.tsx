@@ -11,6 +11,7 @@ export default function Faq() {
 
   const [faqs, setFaqs] = useState<any[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  
 
   const currentStyle =
     projectThemes[webSettings?.theme as keyof typeof projectThemes];

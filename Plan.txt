@@ -1,0 +1,8 @@
+// Todo:
+
+// functionalities:
+// 1. Make the description from the ai
+// 2.filters -> active inactive featured and so on
+// 3.search functionality in categories -> done
+4. add debouncing everywhere at the search
+5. improve the pagination 

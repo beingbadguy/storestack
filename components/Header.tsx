@@ -27,6 +27,29 @@ const Header = () => {
     // console.log("User in header:", user);
   }, [user]);
 
+  const isTenantLive = async () => {
+    if (!user?.userId) {
+      router.push("/login");
+      return;
+    }
+    try {
+      const res = await axiosClient.get(API_ENDPOINTS.GET_TENANT_DETAIL, {
+        params: {
+          sellerId: user?.userId,
+        },
+      });
+      if (res?.data?.success) {
+        const tId = res?.data?.data?._id;
+
+        if (res?.data?.data?.isWebsiteLive) {
+          setSellerDomain(res?.data.data?.slug);
+        }
+      }
+    } catch (error: any) {
+      console.log(error.response?.data);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       console.log("User logged out");
@@ -68,6 +91,7 @@ const Header = () => {
   useEffect(() => {
     if (user?.userId) {
       fetchWebSettings();
+      isTenantLive();
     }
   }, [user]);
 
@@ -152,14 +176,14 @@ const Header = () => {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setLogoutModal(false)}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition hover:bg-gray-100"
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition hover:bg-gray-100 cursor-pointer "
               >
                 Cancel
               </button>
 
               <button
                 onClick={handleLogout}
-                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600"
+                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600 cursor-pointer"
               >
                 Logout
               </button>

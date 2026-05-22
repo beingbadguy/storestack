@@ -187,6 +187,7 @@ export default function LoginPage() {
                   errors?.email ? "border-red-500" : "border-gray-300"
                 } text-gray-700 rounded-lg`}
                 onChange={handleChange}
+                placeholder="you@example.com"
               />
             </div>
             {errors?.email && (
@@ -209,6 +210,7 @@ export default function LoginPage() {
                   errors?.password ? "border-red-500" : "border-gray-300"
                 } text-gray-700 rounded-lg`}
                 onChange={handleChange}
+                placeholder="************"
               />
               <div
                 className="absolute right-3 top-3 cursor-pointer text-gray-400"

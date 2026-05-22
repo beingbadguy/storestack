@@ -92,12 +92,16 @@ export default function AddCategoryPage() {
       toast.error("File size exceeds 5MB limit.");
       return;
     }
+    setLoading(true);
     try {
       const categoryPhotoLink = await singlePhotoUpload(file);
       console.log("Uploaded image URL:", categoryPhotoLink);
       setFormData((prev) => ({ ...prev, image: categoryPhotoLink }));
+      setLoading(false);
     } catch (error) {
       toast.error("Failed to upload image.");
+      console.log(error);
+      setLoading(false);
     }
   };
 
@@ -210,14 +214,14 @@ export default function AddCategoryPage() {
                     Description
                   </label>
 
-                  <button
+                  {/* <button
                     type="button"
                     onClick={generateDescription}
                     disabled={generating}
                     className="rounded-xl bg-teal-500 hover:bg-teal-600 px-4 py-2 text-sm font-medium text-white transition my-2 cursor-pointer"
                   >
                     {generating ? "Generating..." : "✨ Generate With AI"}
-                  </button>
+                  </button> */}
                 </div>
                 <textarea
                   rows={5}
@@ -368,7 +372,7 @@ export default function AddCategoryPage() {
               </div>
             </div>
           </div>
-          <Loader isLoading={loading || generating} />
+          <Loader isLoading={loading} />
 
           {/* Submit */}
           <button

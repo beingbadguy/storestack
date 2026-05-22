@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiMenu, BiX, BiShoppingBag, BiSearch, BiUser } from "react-icons/bi";
 
 export default function DarkNavbar({
@@ -15,18 +15,32 @@ export default function DarkNavbar({
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
+   useEffect(() => {
+      if (isOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "auto";
+      }
+  
+      return () => {
+        document.body.style.overflow = "auto";
+      };
+    }, [isOpen]);
+
   return (
     <nav className="w-full bg-[#121212] text-white border-b border-gray-800 sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          
           <div className="flex-shrink-0">
-            <Link href="/" className="text-2xl font-bold tracking-wider uppercase text-white transition-transform duration-200 hover:scale-105">
+            <Link
+              href="/"
+              className="text-2xl font-bold tracking-wider uppercase text-white transition-transform duration-200 hover:scale-105"
+            >
               {brandName}
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-8">
             {links.map((link, idx) => (
               <Link
                 key={idx}
@@ -51,14 +65,23 @@ export default function DarkNavbar({
                 1
               </span>
             </button>
-            <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-gray-300 ml-2 transition-transform duration-200 active:scale-95">
-              {isOpen ? <BiX className="h-7 w-7 transition-transform duration-300 rotate-90" /> : <BiMenu className="h-7 w-7 transition-transform duration-300" />}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="lg:hidden text-gray-300 ml-2 transition-transform duration-200 active:scale-95"
+            >
+              {isOpen ? (
+                <BiX className="h-7 w-7 transition-transform duration-300 rotate-90" />
+              ) : (
+                <BiMenu className="h-7 w-7 transition-transform duration-300" />
+              )}
             </button>
           </div>
         </div>
       </div>
 
-      <div className={`md:hidden bg-[#1a1a1a] absolute w-full border-b border-gray-800 transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[400px] opacity-100 visible' : 'max-h-0 opacity-0 invisible overflow-hidden'}`}>
+      <div
+        className={`lg:hidden bg-[#1a1a1a] absolute w-full border-b border-gray-800 transition-all duration-300 ease-in-out ${isOpen ? "max-h-[400px] translate-y-0" : "max-h-0 translate-y-[-100%] overflow-hidden"}`}
+      >
         <div className="px-4 py-4 space-y-1">
           {links.map((link, idx) => (
             <Link

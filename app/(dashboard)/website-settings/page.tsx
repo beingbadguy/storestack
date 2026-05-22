@@ -235,7 +235,9 @@ export default function WebsiteSettingsPage() {
     siteLogoLight: "",
     siteLogoDark: "",
     isBannerEnabled: false,
-    bannerType: "image",
+    bannerType: "custom",
+    bannerTitle: "",
+    bannerDescription: "",
     videoBackgroundLink: "",
     bannerImage: "",
     videoBackground: "",
@@ -375,6 +377,23 @@ export default function WebsiteSettingsPage() {
     }
     if (!customSettings?.cookieText) {
       setCookieError("Please add cookie text.");
+      return;
+    }
+
+    if (
+      customSettings?.bannerType === "image" &&
+      !customSettings?.bannerImage
+    ) {
+      toast.error("Please upload a banner image.");
+      return;
+    }
+
+    if (
+      (customSettings?.bannerType === "custom" &&
+        !customSettings?.bannerTitle) ||
+      !customSettings?.bannerDescription
+    ) {
+      toast.error("Please fill in the banner title and description.");
       return;
     }
     setCookieError("");
@@ -777,6 +796,8 @@ export default function WebsiteSettingsPage() {
                 </div>
               )}
 
+              {/* image banner */}
+
               {settings.isBannerEnabled && settings.bannerType === "image" && (
                 <div className="my-2 ">
                   <label className=" block text-xs font-bold   uppercase tracking-wider text-gray-500 mb-1.5">
@@ -879,6 +900,46 @@ export default function WebsiteSettingsPage() {
                   </div> */}
                 </div>
               )}
+
+              {/* custom banner  */}
+              {settings.isBannerEnabled && settings.bannerType === "custom" && (
+                <div className="my-2 ">
+                  <label className=" block text-xs font-bold   uppercase tracking-wider text-gray-500 mb-1.5 ">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={settings?.bannerTitle || ""}
+                    onChange={(e) =>
+                      setSettings({ ...settings, bannerTitle: e.target.value })
+                    }
+                    placeholder="Enter banner title..."
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm bg-white transition-colors"
+                  />
+
+                  <label className=" block text-xs font-bold   uppercase tracking-wider text-gray-500 mb-1.5 mt-4">
+                    Description
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={settings?.bannerDescription || ""}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        bannerDescription: e.target.value,
+                      })
+                    }
+                    placeholder="Enter banner description..."
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm bg-white transition-colors resize-none"
+                  >
+                    {" "}
+                  </textarea>
+                </div>
+              )}
+
+              {/* video banner */}
+
+              {/* slider banner  */}
             </div>
 
             {/* Legal & Compliance */}

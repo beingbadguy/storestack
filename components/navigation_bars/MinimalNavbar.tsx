@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiMenu, BiX, BiShoppingBag, BiSearch, BiUser } from "react-icons/bi";
+import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 interface MinimalNavbarProps {
   brandName?: string;
@@ -20,30 +21,50 @@ export default function MinimalNavbar({
 }: MinimalNavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+
+    useEffect(() => {
+      if (isOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "auto";
+      }
+  
+      return () => {
+        document.body.style.overflow = "auto";
+      };
+    }, [isOpen]);
+  
+
   return (
     <nav className="w-full border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          
           {/* Mobile menu button */}
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center lg:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-gray-600 hover:text-black focus:outline-none p-2 -ml-2 rounded-md transition-transform duration-200 active:scale-95"
             >
-              {isOpen ? <BiX className="h-6 w-6 transition-transform duration-300 rotate-90" /> : <BiMenu className="h-6 w-6 transition-transform duration-300" />}
+              {isOpen ? (
+                <BiX className="h-6 w-6 transition-transform duration-300 rotate-90" />
+              ) : (
+                <BiMenu className="h-6 w-6 transition-transform duration-300" />
+              )}
             </button>
           </div>
 
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="text-2xl font-bold tracking-tight text-gray-900 transition-transform duration-200 hover:scale-105">
+            <Link
+              href="/"
+              className="text-2xl font-bold tracking-tight text-gray-900 transition-transform duration-200 hover:scale-105"
+            >
               {brandName}
             </Link>
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center justify-center space-x-8 flex-1 ml-10">
+          <div className="hidden lg:flex items-center justify-center space-x-8 flex-1 ml-10">
             {links.map((link, idx) => (
               <Link
                 key={idx}
@@ -74,19 +95,21 @@ export default function MinimalNavbar({
       </div>
 
       {/* Mobile Menu */}
-      <div className={`md:hidden bg-white border-t border-gray-100 absolute w-full transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[400px] opacity-100 visible' : 'max-h-0 opacity-0 invisible overflow-hidden'}`}>
-        <div className="px-4 pt-2 pb-6 space-y-1 shadow-xl">
+      <div
+        className={`lg:hidden min-h-screen bg-white border-t border-gray-100 absolute w-full transition-all duration-300 ease-in-out ${isOpen ? "translate-x-0  visible" : "-translate-x-full overflow-hidden"}`}
+      >
+        <div className="px-4 pt-2 pb-6 space-y-1 ">
           {links.map((link, idx) => (
             <Link
               key={idx}
               href={link.href}
-              className="block px-3 py-3.5 text-base font-medium text-gray-800 hover:bg-gray-50 hover:text-black rounded-lg transition-all duration-200"
+              className=" px-3 py-3.5 text-base font-medium text-gray-800 hover:bg-gray-50 hover:text-black rounded-lg transition-all duration-200 flex itesm-center justify-between"
               onClick={() => setIsOpen(false)}
             >
-              {link.label}
+              {link.label} <MdOutlineKeyboardArrowRight className="h-5 w-5 text-gray-500 transition-colors duration-200" />
             </Link>
           ))}
-          <div className="border-t border-gray-100 pt-4 mt-2">
+          <div className="border-t border-gray-300 pt-4 mt-2">
             <Link
               href="/account"
               className="flex items-center px-3 py-3 text-base font-medium text-gray-800 hover:bg-gray-50 hover:text-black rounded-lg transition-all duration-200"
