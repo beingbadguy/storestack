@@ -1,14 +1,25 @@
 "use client";
 
-export default function HeroVideo() {
+export default function HeroVideo({ settings }: { settings: any }) {
+  const videoSrc = settings?.videoBackground || settings?.videoBackgroundLink;
+  
+
+  if (!videoSrc) {
+    return (
+      <section className="relative h-[70vh] w-full overflow-hidden bg-black">
+        <div className="absolute inset-0 bg-black" />
+        <div className="absolute inset-0 z-10 flex items-center justify-center px-4 text-center">
+          <p className="text-white/80 text-sm md:text-base">
+            No banner video is configured yet.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative h-[70vh] w-full overflow-hidden bg-black">
-      {/* FALLBACK BACKGROUND */}
-
       <div className="absolute inset-0 bg-black" />
-
-      {/* VIDEO */}
-
       <video
         className="absolute inset-0 h-full w-full object-cover"
         autoPlay
@@ -16,15 +27,9 @@ export default function HeroVideo() {
         loop
         playsInline
         preload="auto"
-      >
-        <source
-          src="https://www.pexels.com/download/video/36782108/"
-          type="video/mp4"
-        />
-      </video>
-
-      {/* OVERLAY */}
-
+        src={videoSrc}
+        poster={settings?.bannerImage || undefined}
+      />
       <div className="absolute inset-0 bg-black/30" />
     </section>
   );

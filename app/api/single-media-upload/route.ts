@@ -4,25 +4,23 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    console.log(formData);
-    const imageFile = formData.get("image") as File;
-    if (!imageFile) {
+    const file = formData.get("file") || formData.get("image");
+    if (!file || typeof file === "string") {
       return NextResponse.json({
-        message: "No image file found",
+        message: "No file found",
         success: false,
       });
     }
 
-    const bytes = await imageFile.arrayBuffer();
+    const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-
-   
 
     const result: any = await new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
             folder: "store_stack",
+            resource_type: "auto",
           },
           (error, result) => {
             if (error) reject(error);

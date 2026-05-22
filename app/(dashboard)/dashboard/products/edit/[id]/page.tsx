@@ -1,7 +1,7 @@
 "use client";
 
 import Loader from "@/components/Loader";
-import { singlePhotoUpload } from "@/common/singlePhotoUpload";
+import { singleMediaUpload } from "@/common/singleMediaUpload";
 import { axiosClient } from "@/config/axiosClient";
 import { API_ENDPOINTS } from "@/config/endpoint";
 import { useAuthStore } from "@/store/useStore";
@@ -172,7 +172,7 @@ export default function AddProductPage() {
       const uploadedUrls: string[] = [];
 
       for (const file of Array.from(files)) {
-        const uploaded = await singlePhotoUpload(file);
+        const uploaded = await singleMediaUpload(file);
         uploadedUrls.push(uploaded);
       }
 
@@ -228,7 +228,7 @@ export default function AddProductPage() {
       toast.error("Please fill required fields");
 
       return;
-    }   
+    }
 
     try {
       setLoading(true);

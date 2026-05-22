@@ -51,7 +51,7 @@ import { div } from "framer-motion/client";
 import Image from "next/image";
 import { AiOutlineDelete } from "react-icons/ai";
 import { LiaCloudUploadAltSolid } from "react-icons/lia";
-import { singlePhotoUpload } from "@/common/singlePhotoUpload";
+import { singleMediaUpload } from "../../../common/singleMediaUpload";
 import Loader from "@/components/Loader";
 
 type TabId =
@@ -128,7 +128,14 @@ export default function WebsiteSettingsPage() {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [singleBannerImage, setSingleBannerImage] = useState<File | null>(null);
   const [singleBannerPreview, setSingleBannerPreview] = useState<string>("");
+  const [videoBackgroundFile, setVideoBackgroundFile] = useState<File | null>(
+    null,
+  );
+  const [videoBackgroundPreview, setVideoBackgroundPreview] =
+    useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sliderImages, setSliderImages] = useState<File[]>([]);
+  const [sliderPreview, setSliderPreview] = useState<string[]>([]);
 
   const handleBannerImageChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -141,12 +148,31 @@ export default function WebsiteSettingsPage() {
     setSingleBannerImage(file as File);
   };
 
+  const handleVideoBackgroundChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("Video size should be less than 50MB.");
+      return;
+    }
+    setVideoBackgroundFile(file as File);
+  };
+
   useEffect(() => {
     if (!singleBannerImage) return;
     const objectUrl = URL.createObjectURL(singleBannerImage);
     setSingleBannerPreview(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
   }, [singleBannerImage]);
+
+  useEffect(() => {
+    if (!videoBackgroundFile) return;
+    const objectUrl = URL.createObjectURL(videoBackgroundFile);
+    setVideoBackgroundPreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [videoBackgroundFile]);
 
   const singleBannerUpload = async () => {
     try {
@@ -155,7 +181,7 @@ export default function WebsiteSettingsPage() {
         toast.error("Please Select an image to upload");
         return;
       }
-      const imageLink = await singlePhotoUpload(singleBannerImage);
+      const imageLink = await singleMediaUpload(singleBannerImage);
       if (imageLink) {
         console.log(imageLink);
         const newSettings = { ...settings, bannerImage: imageLink };
@@ -163,6 +189,32 @@ export default function WebsiteSettingsPage() {
         saveWebSettings(newSettings);
         setSingleBannerPreview("");
         setSingleBannerImage(null);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const videoBackgroundUpload = async () => {
+    try {
+      setIsLoading(true);
+      if (!videoBackgroundFile) {
+        toast.error("Please select a video to upload.");
+        return;
+      }
+      const videoLink = await singleMediaUpload(videoBackgroundFile);
+      if (videoLink) {
+        const newSettings = {
+          ...settings,
+          videoBackground: videoLink,
+          videoBackgroundLink: "",
+        };
+        setSettings(newSettings);
+        saveWebSettings(newSettings);
+        setVideoBackgroundPreview("");
+        setVideoBackgroundFile(null);
       }
     } catch (error) {
       console.log(error);
@@ -243,7 +295,7 @@ export default function WebsiteSettingsPage() {
     videoBackground: "",
     navbarBackgroundImage: "",
     footerBackgroundImage: "",
-    sliderImages: [],
+    sliderImages: [] as string[],
     contactEmail: "",
     phoneNumber: "",
     city: "",
@@ -389,6 +441,15 @@ export default function WebsiteSettingsPage() {
     }
 
     if (
+      customSettings?.bannerType === "video" &&
+      !customSettings?.videoBackground &&
+      !customSettings?.videoBackgroundLink
+    ) {
+      toast.error("Please upload a video or provide a video link.");
+      return;
+    }
+
+    if (
       (customSettings?.bannerType === "custom" &&
         !customSettings?.bannerTitle) ||
       !customSettings?.bannerDescription
@@ -436,6 +497,44 @@ export default function WebsiteSettingsPage() {
         [platform]: value,
       },
     }));
+  };
+
+  const handleSliderImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = event.target.files;
+    if (files) {
+      const validFiles: File[] = [];
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].size <= 5 * 1024 * 1024) {
+          validFiles.push(files[i]);
+        } else {
+          toast.error(
+            `File ${files[i].name} exceeds the 5MB size limit and was skipped.`,
+          );
+        }
+      }
+      if (validFiles.length > 0) {
+        setIsLoading(true);
+        setSliderImages(validFiles);
+
+        const imageLinks: string[] = [...settings.sliderImages];
+
+        for await (const file of validFiles) {
+          console.log(file);
+          const link = await singleMediaUpload(file);
+          imageLinks.push(link);
+        }
+        const newSettings = { ...settings, sliderImages: imageLinks };
+        setSettings(newSettings);
+        saveWebSettings(newSettings);
+        setSliderPreview([]);
+        setSliderImages([]);
+
+        console.log(validFiles);
+        setIsLoading(false);
+      }
+    }
   };
 
   return (
@@ -938,8 +1037,173 @@ export default function WebsiteSettingsPage() {
               )}
 
               {/* video banner */}
+              {settings.isBannerEnabled && settings.bannerType === "video" && (
+                <div className="my-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                    Banner Video
+                  </label>
+
+                  {settings.videoBackground && !videoBackgroundFile ? (
+                    <div className="relative">
+                      <video
+                        src={settings.videoBackground}
+                        className="mt-4 rounded-lg border w-full h-[300px] object-cover"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        controls={false}
+                      />
+                      <div className="flex items-center gap-3 my-3">
+                        <button
+                          onClick={() => {
+                            setSettings({
+                              ...settings,
+                              videoBackground: "",
+                              videoBackgroundLink: "",
+                            });
+                          }}
+                          className="p-3 border border-red-200 bg-red-50 text-red-500 text-lg font-medium hover:bg-red-100 transition absolute -top-2 -right-3 rounded-full cursor-pointer"
+                        >
+                          <AiOutlineDelete />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative h-36 w-full overflow-hidden rounded-xl border border-dashed border-gray-300 cursor-pointer hover:border-teal-400 transition-all bg-gray-50">
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={handleVideoBackgroundChange}
+                        className="absolute inset-0 z-10 opacity-0 cursor-pointer"
+                      />
+                      <div className="flex h-full w-full flex-col items-center justify-center gap-2 pointer-events-none text-center px-4">
+                        <BiUpload className="text-gray-300 text-3xl" />
+                        <p className="text-xs font-medium text-gray-400">
+                          Click to upload a banner video (MP4, MOV, WEBM)
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Optional: keep the file size under 50MB for best
+                          performance.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {videoBackgroundFile && (
+                    <div className="relative">
+                      <video
+                        src={videoBackgroundPreview}
+                        className="mt-4 rounded-lg border w-full h-[300px] object-cover"
+                        controls
+                        loop
+                        playsInline
+                      />
+                      <div className="flex items-center gap-3 my-3">
+                        <button
+                          className="px-4 py-2 rounded-lg bg-teal-500 text-white font-medium hover:bg-teal-600 transition flex items-center gap-1 justify-center cursor-pointer text-md"
+                          onClick={videoBackgroundUpload}
+                        >
+                          <LiaCloudUploadAltSolid /> Upload Video
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setVideoBackgroundFile(null);
+                            setVideoBackgroundPreview("");
+                          }}
+                          className="p-3 border border-red-200 bg-red-50 text-red-500 text-lg font-medium hover:bg-red-100 transition absolute -top-2 -right-3 rounded-full cursor-pointer"
+                        >
+                          <AiOutlineDelete />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-4">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                      External Video Link
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.videoBackgroundLink}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          videoBackgroundLink: e.target.value,
+                        })
+                      }
+                      placeholder="Paste a remote video URL as fallback"
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors text-sm"
+                    />
+                    <p className="text-xs text-gray-400 mt-2">
+                      If you provide a video link, it will be used when no
+                      uploaded video is available.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* slider banner  */}
+              {settings.isBannerEnabled && settings.bannerType === "slider" && (
+                <div className="my-2 ">
+                  <p className="text-sm text-gray-500 mb-2">
+                    You can add up to 5 images for the slider banner.
+                  </p>
+                  <div className="flex flex-col gap-4">
+                    {settings.sliderImages &&
+                      settings.sliderImages.map((img, index) => (
+                        <div key={index} className="relative">
+                          <Image
+                            src={img}
+                            alt={`Slider Image ${index + 1}`}
+                            width={600}
+                            height={200}
+                            className="mt-4 rounded-lg object-cover border w-full h-[300px]"
+                          />
+                          <button
+                            onClick={() => {
+                              const updatedImages =
+                                settings.sliderImages?.filter(
+                                  (_, i) => i !== index,
+                                );
+                              setSettings({
+                                ...settings,
+                                sliderImages: updatedImages,
+                              });
+                            }}
+                            className="p-3  border border-red-200 bg-red-50 text-red-500 text-lg font-medium hover:bg-red-100 transition absolute -top-2 -right-3 rounded-full cursor-pointer"
+                          >
+                            <AiOutlineDelete />
+                          </button>
+                        </div>
+                      ))}
+
+                    {settings.sliderImages &&
+                      settings.sliderImages.length < 5 && (
+                        <div className="relative h-32 w-full overflow-hidden rounded-xl border border-dashed border-gray-300 cursor-pointer hover:border-teal-400 transition-all bg-gray-50">
+                          {/* Hidden Native Input Layer */}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleSliderImageChange}
+                            className="absolute inset-0 z-10 opacity-0 cursor-pointer"
+                          />
+
+                          {/* UI Layer */}
+                          <div className="flex h-full w-full flex-col items-center justify-center gap-2 pointer-events-none">
+                            <BiImageAdd className="text-gray-300 size-8" />
+
+                            <p className="text-xs font-medium text-gray-400">
+                              Click to upload image
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Legal & Compliance */}

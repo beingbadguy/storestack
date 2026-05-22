@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { BiSearch } from "react-icons/bi";
+import { BiSearch, BiX } from "react-icons/bi";
 
 const SearchHeroSection = ({ settings }: { settings: any }) => {
   const [title, setTitle] = useState<string>(
@@ -9,6 +9,7 @@ const SearchHeroSection = ({ settings }: { settings: any }) => {
   const [description, setDescription] = useState<string>(
     "Shop premium fashion, electronics, and essentials curated for modern living.",
   );
+  const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
     if (settings?.isBannerEnabled) {
@@ -47,12 +48,38 @@ const SearchHeroSection = ({ settings }: { settings: any }) => {
         ))}
       </div>
       <p className="mt-4 text-gray-400">{description}</p>
-      <div className="flex items-center justify-center mt-6 w-full border border-primary rounded-2xl  px-4 bg-white max-w-md">
-        <BiSearch className="size-6 text-primary" />
-        <input
-          className="w-full ml-2 outline-none text-gray-700 py-3 md:py-4"
-          placeholder="Search Anything..."
-        />
+      <div className="w-full max-w-xl mx-auto mt-8">
+        <div className="group relative flex items-center overflow-hidden rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl shadow-sm transition-all duration-300 focus-within:border-primary focus-within:shadow-[0_0_25px_rgba(59,130,246,0.15)] hover:border-gray-300">
+          {/* Left Icon */}
+          <div className="pl-5">
+            <BiSearch className="size-5 text-gray-400 transition-colors duration-300 group-focus-within:text-primary" />
+          </div>
+
+          {/* Input */}
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search products, categories, brands..."
+            className="w-full bg-transparent px-4 py-4 text-sm md:text-base text-gray-700 placeholder:text-gray-400 outline-none"
+          />
+
+          {/* close button  */}
+
+          {search && search.length > 0 && (
+            <div
+              className="flex items-center pr-4 cursor-pointer"
+              onClick={() => setSearch("")}
+            >
+              <div className="text-2xl text-gray-400 transition-colors duration-300 group-focus-within:text-primary">
+                <BiX />
+              </div>
+            </div>
+          )}
+
+          {/* Glow Effect */}
+          <div className="absolute inset-0 -z-10 opacity-0 blur-2xl transition-opacity duration-300 group-focus-within:opacity-100 bg-primary/10" />
+        </div>
       </div>
     </div>
   );

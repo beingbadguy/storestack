@@ -9,7 +9,7 @@ export const API_ENDPOINTS = {
   GET_WEBSETTINGS: "/api/websettings",
   ADD_FAQ: "/api/faq",
   DELETE_FAQ: "/api/faq",
-  UPLOAD_IMAGE: "/api/single-image-upload",
+  UPLOAD_MEDIA: "/api/single-media-upload",
   GET_CATEGORIES: "/api/category",
   ADD_CATEGORY: "/api/category",
   GENERATE_DESCRIPTION: "/api/generate-description",

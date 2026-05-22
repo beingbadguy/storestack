@@ -1,6 +1,6 @@
 "use client";
 
-import { singlePhotoUpload } from "@/common/singlePhotoUpload";
+import { singleMediaUpload } from "@/common/singleMediaUpload";
 import Loader from "@/components/Loader";
 import { axiosClient } from "@/config/axiosClient";
 import { API_ENDPOINTS } from "@/config/endpoint";
@@ -94,7 +94,7 @@ export default function AddCategoryPage() {
     }
     setLoading(true);
     try {
-      const categoryPhotoLink = await singlePhotoUpload(file);
+      const categoryPhotoLink = await singleMediaUpload(file);
       console.log("Uploaded image URL:", categoryPhotoLink);
       setFormData((prev) => ({ ...prev, image: categoryPhotoLink }));
       setLoading(false);

@@ -50,7 +50,7 @@ const webSettingsSchema = new mongoose.Schema(
     isBannerEnabled: { type: Boolean, default: false },
     bannerType: {
       type: String,
-      enum: ["image", "videobackground", "slider", "custom"],
+      enum: ["image", "video", "slider", "custom"],
       default: "custom",
     },
 
