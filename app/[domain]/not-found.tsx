@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/useStore";
 import { projectThemes } from "@/theme/theme";
 import { useEffect } from "react";
 import { FiAlertTriangle } from "react-icons/fi";
+import { STORE_PAGE_BG, STORE_SURFACE_BG } from "@/config/storefront";
 
 export default function NotFound() {
   const { webSettings } = useAuthStore();
@@ -17,8 +18,12 @@ export default function NotFound() {
     console.log(webSettings);
   }, []);
   return (
-    <div className="flex min-h-[60vh] items-center justify-center bg-gradient-to-b from-gray-50 to-white p-4 py-12">
-      <div className="w-full max-w-2xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden bg-white border border-gray-100">
+    <div
+      className={`flex min-h-[60vh] items-center justify-center ${STORE_PAGE_BG} p-4 py-12`}
+    >
+      <div
+        className={`w-full max-w-2xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden ${STORE_SURFACE_BG} border border-neutral-200`}
+      >
         {/* Header Section */}
         <div
           className={` ${currentTheme.background} p-8 flex flex-col items-center justify-center text-white`}

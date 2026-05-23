@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 import { projectThemes } from "@/theme/theme";
+import { STORE_SURFACE_BG } from "@/config/storefront";
 
 export default function Faq() {
   const { webSettings } = useAuthStore();
@@ -29,7 +30,7 @@ export default function Faq() {
   return (
     faqs &&
     faqs.length > 0 && (
-      <section className="w-full bg-[#f8f8f8] py-20 px-4">
+      <section className={`w-full ${STORE_SURFACE_BG} py-20 px-4`}>
         <div className="max-w-4xl mx-auto">
           {/* Top Section */}
           <div className="text-center mb-14">

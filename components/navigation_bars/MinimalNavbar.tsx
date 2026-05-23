@@ -13,22 +13,16 @@ import {
   BiUser,
 } from "react-icons/bi";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-
-interface MinimalNavbarProps {
-  brandName?: string;
-  links?: { label: string; href: string }[];
-}
+import {
+  DEFAULT_BRAND_NAME,
+  DEFAULT_NAV_LINKS,
+  type NavbarProps,
+} from "@/config/navbar";
 
 export default function MinimalNavbar({
-  brandName = "Vogue.",
-  links = [
-    { label: "Home", href: "/" },
-    { label: "All Products", href: "/products" },
-    { label: "Best Sellers", href: "/best-sellers" },
-    { label: "Track Order", href: "/track-order" },
-    { label: "Contact Us", href: "/contact" },
-  ],
-}: MinimalNavbarProps) {
+  brandName = DEFAULT_BRAND_NAME,
+  links = DEFAULT_NAV_LINKS,
+}: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuthStore();
   const router = useRouter();

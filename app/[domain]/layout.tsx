@@ -17,6 +17,7 @@ import CenteredFooter from "@/components/footers/CenteredFooter";
 import NewsletterFooter from "@/components/footers/NewsletterFooter";
 import CookieConsent from "@/components/CookieConsent";
 import Hydrator from "@/components/Hydator";
+import { STORE_PAGE_BG } from "@/config/storefront";
 
 export async function generateMetadata({
   params,
@@ -79,7 +80,9 @@ export default async function DomainLayout({
 
   if (!tenant) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f8f9fa] p-4 py-12">
+      <div
+        className={`flex min-h-screen items-center justify-center ${STORE_PAGE_BG} p-4 py-12`}
+      >
         <div className="w-full max-w-2xl bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden">
           <div className="bg-gradient-to-r from-teal-500 to-teal-400 p-8 flex flex-col items-center justify-center text-white">
             <div className="bg-white p-3.5 rounded-2xl mb-4 shadow-sm">
@@ -154,7 +157,7 @@ export default async function DomainLayout({
   const settingsData = settings ? JSON.parse(JSON.stringify(settings)) : null;
 
   return (
-    <div className={` bg-white theme-${theme}`}>
+    <div className={`${STORE_PAGE_BG} theme-${theme}`}>
       {navbarLayout === "minimal" && <MinimalNavbar brandName={brandName} />}
       {navbarLayout === "centered" && <CenteredNavbar brandName={brandName} />}
       {navbarLayout === "floating" && <FloatingNavbar brandName={brandName} />}

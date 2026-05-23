@@ -6,6 +6,9 @@ import Hydrator from "@/components/Hydator";
 import Faq from "@/components/Faq";
 import HeroSection from "@/components/HeroSection";
 import Categories from "@/components/Categories";
+import Products from "@/components/Products";
+import TrustStrip from "@/components/TrustStrip";
+import Testimonials from "@/components/Testimonials";
 
 export default async function DomainHomePage({
   params,
@@ -34,12 +37,15 @@ export default async function DomainHomePage({
   const settingsData = settings ? JSON.parse(JSON.stringify(settings)) : null;
 
   return (
-    <div className={`flex flex-col  bg-gray-50 theme-${theme}`}>
+    <div className={`flex flex-col theme-${theme}`}>
       <Hydrator settings={settingsData} />
 
       {/* hero section  */}
       <HeroSection />
       <Categories />
+      <TrustStrip />
+      <Products />
+      <Testimonials />
 
       {/* faq */}
       <Faq />

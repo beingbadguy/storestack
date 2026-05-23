@@ -11,17 +11,16 @@ import {
   BiUser,
   BiGlobe,
 } from "react-icons/bi";
+import {
+  DEFAULT_BRAND_NAME,
+  DEFAULT_NAV_LINKS,
+  type NavbarProps,
+} from "@/config/navbar";
 
 export default function DoubleNavbar({
-  brandName = "Vogue.",
-  links = [
-    { label: "Home", href: "/" },
-    { label: "All Products", href: "/products" },
-    { label: "Best Sellers", href: "/best-sellers" },
-    { label: "Track Order", href: "/track-order" },
-    { label: "Contact Us", href: "/contact" },
-  ],
-}) {
+  brandName = DEFAULT_BRAND_NAME,
+  links = DEFAULT_NAV_LINKS,
+}: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuthStore();
 

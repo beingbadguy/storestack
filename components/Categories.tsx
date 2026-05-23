@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store/useStore";
 import { useEffect, useState } from "react";
 import { CategorySkeleton } from "./CategorySkeleton";
 import Image from "next/image";
+import { STORE_MUTED_BG } from "@/config/storefront";
 
 const Categories = () => {
   const { webSettings } = useAuthStore();
@@ -53,7 +54,7 @@ const Categories = () => {
           {categories.map((category: any) => (
             <div
               key={category._id}
-              className="group cursor-pointer overflow-hidden   bg-[#f5f5f5]"
+              className={`group cursor-pointer overflow-hidden ${STORE_MUTED_BG}`}
             >
               <div className="relative  h-[420px] overflow-hidden">
                 <Image
@@ -79,7 +80,9 @@ const Categories = () => {
           ))}
         </div>
       ) : (
-        <div className="flex min-h-[350px] flex-col items-center justify-center rounded-3xl bg-neutral-50 px-6 text-center">
+        <div
+          className={`flex min-h-[350px] flex-col items-center justify-center rounded-3xl ${STORE_MUTED_BG} px-6 text-center`}
+        >
           <h2 className="text-3xl font-semibold tracking-tight">
             No Active Categories
           </h2>

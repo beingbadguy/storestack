@@ -9,6 +9,7 @@ import Link from "next/link";
 import { API_ENDPOINTS } from "@/config/endpoint";
 import { axiosClient } from "@/config/axiosClient";
 import { useAuthStore } from "@/store/useStore";
+import { STORE_SURFACE_BG } from "@/config/storefront";
 
 export default function LoginPage() {
   const { user, setUser } = useAuthStore();
@@ -57,8 +58,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-[90vh] h-[90vh] items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-xl rounded-2xl border border-gray-100 bg-white p-6 shadow-sm md:p-10">
+    <div className="flex min-h-[90vh] h-[90vh] items-center justify-center p-4">
+      <div
+        className={`w-full max-w-xl rounded-2xl border border-neutral-200 ${STORE_SURFACE_BG} p-6 shadow-sm md:p-10`}
+      >
         {/* Heading */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">

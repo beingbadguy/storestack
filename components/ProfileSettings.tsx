@@ -15,6 +15,7 @@ import {
   BiUser,
 } from "react-icons/bi";
 import Loader from "./Loader";
+import { STORE_PAGE_BG } from "@/config/storefront";
 
 type ProfileTab = "account" | "orders" | "settings";
 
@@ -66,7 +67,7 @@ export default function ProfileSettings() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7] text-[#303030]">
+    <div className={`min-h-screen ${STORE_PAGE_BG} text-[#303030]`}>
       <Loader isLoading={isLoggingOut} />
       <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:px-12">
         <div className="mb-6 flex flex-col gap-4 border-b border-[#e4e4e4] pb-0 sm:flex-row sm:items-end sm:justify-between">

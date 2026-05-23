@@ -9,7 +9,7 @@ export function CategorySkeleton() {
 
       <div className="grid gap-6 md:grid-cols-3">
         {[1, 2, 3].map((item) => (
-          <div key={item} className="overflow-hidden rounded-3xl bg-[#f5f5f5]">
+          <div key={item} className="overflow-hidden rounded-3xl bg-neutral-100">
             <div className="h-[420px] animate-pulse bg-neutral-200" />
 
             <div className="space-y-3 p-5">
