@@ -5,6 +5,7 @@ import NewsletterModal from "@/components/NewsletterModal";
 import Hydrator from "@/components/Hydator";
 import Faq from "@/components/Faq";
 import HeroSection from "@/components/HeroSection";
+import Categories from "@/components/Categories";
 
 export default async function DomainHomePage({
   params,
@@ -38,6 +39,7 @@ export default async function DomainHomePage({
 
       {/* hero section  */}
       <HeroSection />
+      <Categories />
 
       {/* faq */}
       <Faq />

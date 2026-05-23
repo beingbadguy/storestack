@@ -20,6 +20,7 @@ const webSettingsSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: false,
+      unique: true,
     },
     // General Information
     brandName: { type: String, default: "My Store" },

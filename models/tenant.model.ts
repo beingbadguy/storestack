@@ -14,6 +14,13 @@ const tenantSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    tenantId: {
+      ownerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      }
+    },
+    
     slug: {
       type: String,
       required: true,

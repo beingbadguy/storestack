@@ -69,13 +69,12 @@ export default function DomainSignupPage() {
         email,
         password,
         confirmPassword,
-     
       });
 
       if (response.data.success) {
         console.log(response.data);
         toast.success("Account created successfully");
-        // router.push("/");
+        router.push("/");
       }
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
