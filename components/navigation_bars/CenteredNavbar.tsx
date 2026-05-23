@@ -54,7 +54,7 @@ export default function CenteredNavbar({
           <div className="flex items-center flex-1 xl:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 -ml-2 text-gray-800 transition-transform duration-200 active:scale-95"
+              className="cursor-pointer p-2 -ml-2 text-gray-800 transition-transform duration-200 active:scale-95"
             >
               {isOpen ? (
                 <BiX className="h-6 w-6 transition-transform duration-300 rotate-90" />
@@ -62,7 +62,7 @@ export default function CenteredNavbar({
                 <BiMenu className="h-6 w-6 transition-transform duration-300" />
               )}
             </button>
-            <button className="p-2 ml-2 text-gray-800 transition-all duration-200 hover:scale-110 active:scale-95">
+            <button className="cursor-pointer p-2 ml-2 text-gray-800 transition-all duration-200 hover:scale-110 active:scale-95">
               <BiSearch className="h-5 w-5" />
             </button>
           </div>
@@ -84,7 +84,7 @@ export default function CenteredNavbar({
           <div className="flex-shrink-0 flex items-center justify-center">
             <Link
               href="/"
-              className="text-3xl font-serif italic tracking-tight text-gray-900 transition-transform duration-200 hover:scale-105"
+              className="cursor-pointer text-3xl font-serif italic tracking-tight text-gray-900 transition-transform duration-200 hover:scale-105"
             >
               {brandName}
             </Link>
@@ -92,21 +92,33 @@ export default function CenteredNavbar({
 
           {/* Icons (Right side) */}
           <div className="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
-            <button className="hidden xl:block text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95">
+            <button className="cursor-pointer hidden xl:block text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95">
               <BiSearch className="h-5 w-5" />
             </button>
-            <button className="hidden sm:block text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95">
+            <Link
+              href="/profile"
+              aria-label="Profile"
+              className="cursor-pointer text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95"
+            >
               <BiUser className="h-5 w-5" />
-            </button>
-            <button className="text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95">
+            </Link>
+            <Link
+              href="/wishlist"
+              aria-label="Wishlist"
+              className="cursor-pointer text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95"
+            >
               <BiHeart className="h-5 w-5" />
-            </button>
-            <button className="text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95 relative">
+            </Link>
+            <Link
+              href="/cart"
+              aria-label="Cart"
+              className="cursor-pointer text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95 relative"
+            >
               <BiShoppingBag className="h-5 w-5" />
               <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110">
                 2
               </span>
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -120,26 +132,36 @@ export default function CenteredNavbar({
             <Link
               key={idx}
               href={link.href}
-              className="block text-lg font-medium text-gray-900 uppercase tracking-wide transition-all duration-200"
+              className="cursor-pointer block text-lg font-medium text-gray-900 uppercase tracking-wide transition-all duration-200"
               onClick={() => setIsOpen(false)}
             >
               {link.label}
             </Link>
           ))}
-          <div className="pt-6 mt-6 border-t border-gray-300 grid grid-cols-2 gap-4">
+          <div className="pt-6 mt-6 border-t border-gray-300 grid grid-cols-3 gap-3">
             <Link
-              href="/account"
-              className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-gray-100"
+              href="/profile"
+              className="cursor-pointer flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-gray-100"
+              onClick={() => setIsOpen(false)}
             >
               <BiUser className="h-6 w-6 mb-2 transition-colors duration-200" />
               Account
             </Link>
             <Link
               href="/wishlist"
-              className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-gray-100"
+              className="cursor-pointer flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-gray-100"
+              onClick={() => setIsOpen(false)}
             >
               <BiHeart className="h-6 w-6 mb-2 transition-colors duration-200" />
               Wishlist
+            </Link>
+            <Link
+              href="/cart"
+              className="cursor-pointer flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-gray-100"
+              onClick={() => setIsOpen(false)}
+            >
+              <BiShoppingBag className="h-6 w-6 mb-2 transition-colors duration-200" />
+              Cart
             </Link>
           </div>
         </div>

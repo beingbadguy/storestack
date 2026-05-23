@@ -20,16 +20,16 @@ const userSchema = new Schema(
     },
     mobile: {
       type: String,
-      required: true,
+      required: false,
     },
     countryCode: {
       type: String,
-      required: true,
+      required: false,
     },
     role: {
       type: String,
-      enum: ["user", "agent", "staff", "superadmin"],
-      default: "user",
+      enum: ["customer", "tenant", "staff", "superadmin"],
+      default: "customer",
     },
     isAccountVerified: {
       type: Boolean,
@@ -68,6 +68,11 @@ const userSchema = new Schema(
     hasAcceptedCookies: {
       type: Boolean,
       default: false,
+    },
+    tenantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tenant",
+      required: false,
     },
   },
   {

@@ -1,5 +1,6 @@
 import { createTokenAndSetCookie } from "@/config/createTokenAndSetCookie";
 import { connectToDatabase } from "@/config/databaseConnection";
+import Tenant from "@/models/tenant.model";
 import { User } from "@/models/user.model";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
@@ -21,15 +22,7 @@ export async function POST(request: NextRequest) {
     } = body;
     console.log(body);
 
-    if (
-      !firstName ||
-      !lastName ||
-      !email ||
-      !password ||
-      !confirmPassword ||
-      !countryCode ||
-      !mobile
-    ) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       return NextResponse.json(
         {
           message: "All fields are required.",
@@ -96,19 +89,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const mobileRegex = /^[0-9]{10}$/;
-    if (!mobileRegex.test(mobile)) {
-      return NextResponse.json(
-        {
-          message: "Invalid mobile number format.",
-          success: false,
-          data: null,
-        },
-        {
-          status: 400,
-        },
-      );
+   
+
+    let isUserTenant = true;
+
+    const domainOrigin = request.headers.get("host");
+    console.log(domainOrigin?.split(".")[0]);
+
+    const tenant = await Tenant.findOne({
+      slug: domainOrigin?.split(".")[0],
+    });
+
+    if (tenant) {
+      isUserTenant = false;
     }
+
+
+
+     const mobileRegex = /^[0-9]{10}$/;
+     if (isUserTenant && !mobileRegex.test(mobile)) {
+       return NextResponse.json(
+         {
+           message: "Invalid mobile number format.",
+           success: false,
+           data: null,
+         },
+         {
+           status: 400,
+         },
+       );
+     }
 
     // hash the password and save the user to the database here
 
@@ -122,7 +132,8 @@ export async function POST(request: NextRequest) {
       password: hashedPassword,
       countryCode,
       mobile,
-      role: origin === "admin" ? "agent" : "user",
+      role: origin === "admin" ? "tenant" : "customer",
+      tenantId: isUserTenant ? null : tenant._id,
     });
     await newUser.save();
 
@@ -136,6 +147,7 @@ export async function POST(request: NextRequest) {
       lastName: newUser.lastName,
       email: newUser.email,
       role: newUser.role,
+      tenantId: isUserTenant ? null : tenant._id,
     };
 
     const res = NextResponse.json(

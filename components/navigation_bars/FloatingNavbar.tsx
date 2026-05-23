@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { BiMenu, BiX, BiShoppingBag, BiSearch } from "react-icons/bi";
+import { BiMenu, BiX, BiShoppingBag, BiHeart, BiSearch, BiUser } from "react-icons/bi";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 export default function FloatingNavbar({
@@ -35,7 +35,7 @@ export default function FloatingNavbar({
           <div className="flex-shrink-0">
             <Link
               href="/"
-              className="text-xl font-bold tracking-tighter text-gray-900 transition-transform duration-200 hover:scale-105"
+              className="cursor-pointer text-xl font-bold tracking-tighter text-gray-900 transition-transform duration-200 hover:scale-105"
             >
               {brandName}
             </Link>
@@ -54,15 +54,33 @@ export default function FloatingNavbar({
           </div>
 
           <div className="flex items-center space-x-5">
-            <button className="text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95">
+            <button className="cursor-pointer text-gray-800 hover:text-black transition-all duration-200 hover:scale-110 active:scale-95">
               <BiSearch className="h-5 w-5" />
             </button>
-            <button className="text-gray-800 hover:text-black flex items-center transition-all duration-200 hover:scale-110 active:scale-95">
+            <Link
+              href="/wishlist"
+              aria-label="Wishlist"
+              className="cursor-pointer text-gray-800 hover:text-black flex items-center transition-all duration-200 hover:scale-110 active:scale-95"
+            >
+              <BiHeart className="h-5 w-5" />
+            </Link>
+            <Link
+              href="/cart"
+              aria-label="Cart"
+              className="cursor-pointer text-gray-800 hover:text-black flex items-center transition-all duration-200 hover:scale-110 active:scale-95"
+            >
               <BiShoppingBag className="h-5 w-5" />
-            </button>
+            </Link>
+            <Link
+              href="/profile"
+              aria-label="Profile"
+              className="cursor-pointer text-gray-800 hover:text-black flex items-center transition-all duration-200 hover:scale-110 active:scale-95"
+            >
+              <BiUser className="h-5 w-5" />
+            </Link>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden text-gray-800 ml-2 transition-transform duration-200 active:scale-95"
+              className="cursor-pointer lg:hidden text-gray-800 ml-2 transition-transform duration-200 active:scale-95"
             >
               {isOpen ? (
                 <BiX className="h-6 w-6 transition-transform duration-300 rotate-90" />
@@ -83,13 +101,39 @@ export default function FloatingNavbar({
             <Link
               key={idx}
               href={link.href}
-              className="block text-lg font-semibold text-gray-900 transition-all duration-200 hover:text-teal-600 flex items-center justify-between "
+              className="cursor-pointer text-lg font-semibold text-gray-900 transition-all duration-200 hover:text-teal-600 flex items-center justify-between "
               onClick={() => setIsOpen(false)}
             >
               {link.label}{" "}
               <MdOutlineKeyboardArrowRight className=" text-gray-500 size-6" />
             </Link>
           ))}
+          <div className="grid grid-cols-3 gap-3 border-t border-gray-200 pt-4">
+            <Link
+              href="/profile"
+              className="cursor-pointer flex flex-col items-center justify-center rounded-2xl bg-gray-50 p-3 text-xs font-semibold text-gray-900 transition-all duration-200 hover:bg-gray-100"
+              onClick={() => setIsOpen(false)}
+            >
+              <BiUser className="mb-1 h-5 w-5" />
+              Profile
+            </Link>
+            <Link
+              href="/wishlist"
+              className="cursor-pointer flex flex-col items-center justify-center rounded-2xl bg-gray-50 p-3 text-xs font-semibold text-gray-900 transition-all duration-200 hover:bg-gray-100"
+              onClick={() => setIsOpen(false)}
+            >
+              <BiHeart className="mb-1 h-5 w-5" />
+              Wishlist
+            </Link>
+            <Link
+              href="/cart"
+              className="cursor-pointer flex flex-col items-center justify-center rounded-2xl bg-gray-50 p-3 text-xs font-semibold text-gray-900 transition-all duration-200 hover:bg-gray-100"
+              onClick={() => setIsOpen(false)}
+            >
+              <BiShoppingBag className="mb-1 h-5 w-5" />
+              Cart
+            </Link>
+          </div>
         </div>
       </div>
     </div>

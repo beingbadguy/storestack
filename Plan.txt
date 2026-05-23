@@ -6,3 +6,5 @@
 // 3.search functionality in categories -> done
 4. add debouncing everywhere at the search
 5. improve the pagination 
+6.add the enter url validation link 
+7. the same customer can be the customer in various subdomains

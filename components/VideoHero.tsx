@@ -2,7 +2,7 @@
 
 export default function HeroVideo({ settings }: { settings: any }) {
   const videoSrc = settings?.videoBackground || settings?.videoBackgroundLink;
-  
+  console.log("videoSrc", videoSrc);
 
   if (!videoSrc) {
     return (

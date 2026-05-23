@@ -450,9 +450,8 @@ export default function WebsiteSettingsPage() {
     }
 
     if (
-      (customSettings?.bannerType === "custom" &&
-        !customSettings?.bannerTitle) ||
-      !customSettings?.bannerDescription
+      customSettings?.bannerType === "custom" &&
+      (!customSettings?.bannerTitle || !customSettings?.bannerDescription)
     ) {
       toast.error("Please fill in the banner title and description.");
       return;
