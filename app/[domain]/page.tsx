@@ -43,7 +43,8 @@ export default async function DomainHomePage({
       {/* hero section  */}
       <HeroSection />
       <Categories />
-      <TrustStrip />
+
+      {settings?.isTrustStripEnabled && <TrustStrip settings={settings} />}
       <Products />
       <Testimonials />
 

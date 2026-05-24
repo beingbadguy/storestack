@@ -1,6 +1,7 @@
 "use client";
 
 import Loader from "@/components/Loader";
+import { CategorySelect } from "@/components/CategorySelect";
 import { singleMediaUpload } from "@/common/singleMediaUpload";
 import { axiosClient } from "@/config/axiosClient";
 import { API_ENDPOINTS } from "@/config/endpoint";
@@ -29,6 +30,7 @@ import {
 type Category = {
   _id: string;
   name: string;
+  image: string;
 };
 
 type ProductForm = {
@@ -320,25 +322,16 @@ export default function AddProductPage() {
                     Category
                   </label>
 
-                  <select
+                  <CategorySelect
+                    categories={categories}
                     value={formData.category}
-                    onChange={(e) =>
+                    onValueChange={(category) =>
                       setFormData((prev) => ({
                         ...prev,
-
-                        category: e.target.value,
+                        category,
                       }))
                     }
-                    className="h-12 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none focus:border-teal-500"
-                  >
-                    <option value="">Select Category</option>
-
-                    {categories.map((category) => (
-                      <option key={category._id} value={category._id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
 
                 <div>

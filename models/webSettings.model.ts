@@ -8,6 +8,15 @@ const faqSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+const trustStripSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    subtitle: { type: String, required: true },
+    icon: { type: String, required: true },
+  },
+  { timestamps: true },
+);
+
 const webSettingsSchema = new mongoose.Schema(
   {
     tenantId: {
@@ -100,6 +109,14 @@ const webSettingsSchema = new mongoose.Schema(
 
     // faq
     faqs: [faqSchema],
+
+    // trust Strip
+    isTrustStripEnabled: {
+      type: Boolean,
+      default: false,
+    },
+
+    trustStrips: [trustStripSchema],
   },
   { timestamps: true },
 );

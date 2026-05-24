@@ -21,4 +21,6 @@ export const API_ENDPOINTS = {
   DELETE_PRODUCT: (id: string) => `/api/products/${id}`,
   UPDATE_PRODUCT: (id: string) => `/api/products/${id}`,
   GET_PRODUCT: (id: string) => `/api/products/${id}`,
+  ADD_TRUST: "/api/trust",
+  DELETE_TRUST: "/api/trust",
 };

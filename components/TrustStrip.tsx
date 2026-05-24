@@ -1,55 +1,42 @@
 import { ShieldCheck, Truck, Headphones, RefreshCcw } from "lucide-react";
 import { STORE_SURFACE_BG } from "@/config/storefront";
+import { TRUST_STRIP_ICONS } from "@/common/config";
 
-const trustItems = [
-  {
-    icon: Truck,
-    title: "Free Shipping",
-    subtitle: "On all orders over ₹999",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Secure Payments",
-    subtitle: "100% protected checkout",
-  },
-  {
-    icon: RefreshCcw,
-    title: "Easy Returns",
-    subtitle: "7-day hassle-free returns",
-  },
-  {
-    icon: Headphones,
-    title: "24/7 Support",
-    subtitle: "Dedicated customer assistance",
-  },
-];
+export default function TrustStrip(settings: any) {
+  console.log(settings, "is the truststrips settings");
 
-export default function TrustStrip() {
+  console.log(settings?.settings?.trustStrips, "is the truststrips");
   return (
     <section className={`border-y border-neutral-200 ${STORE_SURFACE_BG}`}>
-      <div className="mx-auto grid max-w-7xl grid-cols-1 divide-y divide-neutral-200 md:grid-cols-4 md:divide-x md:divide-y-0">
-        {trustItems.map((item, index) => {
-          const Icon = item.icon;
+      <div className="mx-auto flex items-center justify-center max-w-7xl  divide-y divide-neutral-200 md:divide-x md:divide-y-0">
+        {settings?.settings?.trustStrips &&
+          settings?.settings?.trustStrips.map((item: any, index: number) => {
+            const Icon = item.icon;
 
-          return (
-            <div
-              key={index}
-              className="flex items-center gap-4 px-6 py-8 transition hover:bg-neutral-50"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
-                <Icon className="h-5 w-5 text-neutral-700" />
+            const SelectedIcon =
+              TRUST_STRIP_ICONS[item.icon as keyof typeof TRUST_STRIP_ICONS];
+
+            return (
+              <div
+                key={index}
+                className="flex items-center gap-4 px-6 py-8 transition hover:bg-neutral-50"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+                  <SelectedIcon className="h-5 w-5 text-neutral-700" />
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-semibold tracking-wide text-neutral-900">
+                    {item.title}
+                  </h3>
+
+                  <p className="mt-1 text-sm text-neutral-500">
+                    {item.subtitle}
+                  </p>
+                </div>
               </div>
-
-              <div>
-                <h3 className="text-sm font-semibold tracking-wide text-neutral-900">
-                  {item.title}
-                </h3>
-
-                <p className="mt-1 text-sm text-neutral-500">{item.subtitle}</p>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </section>
   );

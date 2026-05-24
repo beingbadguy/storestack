@@ -38,10 +38,12 @@ import {
   FiTrash2,
   FiEdit,
 } from "react-icons/fi";
+import { CiEdit } from "react-icons/ci";
 import {
   BiCross,
   BiImage,
   BiImageAdd,
+  BiPlus,
   BiSearch,
   BiUpload,
   BiX,
@@ -53,6 +55,273 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { LiaCloudUploadAltSolid } from "react-icons/lia";
 import { singleMediaUpload } from "../../../common/singleMediaUpload";
 import Loader from "@/components/Loader";
+
+import { FiTruck, FiCreditCard, FiGift } from "react-icons/fi";
+
+import { LiaHandshakeSolid } from "react-icons/lia";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import {
+  FiHeadphones,
+  FiPackage,
+  FiLock,
+  FiStar,
+  FiHeart,
+} from "react-icons/fi";
+
+import {
+  FiAward,
+  FiClock,
+  FiTag,
+  FiThumbsUp,
+  FiBell,
+  FiMessageCircle,
+  FiUsers,
+  FiBookmark,
+  FiBox,
+  FiBriefcase,
+  FiCamera,
+  FiCoffee,
+  FiCompass,
+  FiFeather,
+  FiFlag,
+  FiHome,
+  FiLifeBuoy,
+  FiMonitor,
+  FiMoon,
+  FiPaperclip,
+  FiSend,
+  FiShoppingBag,
+  FiSun,
+  FiTarget,
+  FiTool,
+  FiUnlock,
+  FiUserCheck,
+  FiWifi,
+  FiZap,
+} from "react-icons/fi";
+
+import { LiaShippingFastSolid } from "react-icons/lia";
+import { TRUST_STRIP_ICONS } from "@/common/config";
+
+export const TRUST_STRIP_ICON_OPTIONS = [
+  {
+    name: "truck",
+    icon: FiTruck,
+  },
+  {
+    name: "shield",
+    icon: FiShield,
+  },
+  {
+    name: "refresh",
+    icon: FiRefreshCcw,
+  },
+  {
+    name: "payment",
+    icon: FiCreditCard,
+  },
+  {
+    name: "gift",
+    icon: FiGift,
+  },
+  {
+    name: "handshake",
+    icon: LiaHandshakeSolid,
+  },
+  {
+    name: "headphones",
+    icon: FiHeadphones,
+  },
+  {
+    name: "package",
+    icon: FiPackage,
+  },
+  {
+    name: "lock",
+    icon: FiLock,
+  },
+  {
+    name: "star",
+    icon: FiStar,
+  },
+  {
+    name: "heart",
+    icon: FiHeart,
+  },
+  {
+    name: "check",
+    icon: FiCheckCircle,
+  },
+  {
+    name: "award",
+    icon: FiAward,
+  },
+  {
+    name: "clock",
+    icon: FiClock,
+  },
+  {
+    name: "tag",
+    icon: FiTag,
+  },
+  {
+    name: "thumbs",
+    icon: FiThumbsUp,
+  },
+  {
+    name: "globe",
+    icon: FiGlobe,
+  },
+  {
+    name: "cart",
+    icon: FiShoppingCart,
+  },
+  {
+    name: "location",
+    icon: FiMapPin,
+  },
+  {
+    name: "bell",
+    icon: FiBell,
+  },
+  {
+    name: "message",
+    icon: FiMessageCircle,
+  },
+  {
+    name: "mail",
+    icon: FiMail,
+  },
+  {
+    name: "phone",
+    icon: FiPhone,
+  },
+  {
+    name: "users",
+    icon: FiUsers,
+  },
+  {
+    name: "bookmark",
+    icon: FiBookmark,
+  },
+  {
+    name: "box",
+    icon: FiBox,
+  },
+  {
+    name: "briefcase",
+    icon: FiBriefcase,
+  },
+  {
+    name: "camera",
+    icon: FiCamera,
+  },
+  {
+    name: "coffee",
+    icon: FiCoffee,
+  },
+  {
+    name: "compass",
+    icon: FiCompass,
+  },
+  {
+    name: "feather",
+    icon: FiFeather,
+  },
+  {
+    name: "flag",
+    icon: FiFlag,
+  },
+  {
+    name: "home",
+    icon: FiHome,
+  },
+  {
+    name: "image",
+    icon: FiImage,
+  },
+  {
+    name: "layers",
+    icon: FiLayers,
+  },
+  {
+    name: "support",
+    icon: FiLifeBuoy,
+  },
+  {
+    name: "monitor",
+    icon: FiMonitor,
+  },
+  {
+    name: "moon",
+    icon: FiMoon,
+  },
+  {
+    name: "navigation",
+    icon: FiNavigation,
+  },
+  {
+    name: "paperclip",
+    icon: FiPaperclip,
+  },
+  {
+    name: "send",
+    icon: FiSend,
+  },
+  {
+    name: "settings",
+    icon: FiSettings,
+  },
+  {
+    name: "bag",
+    icon: FiShoppingBag,
+  },
+  {
+    name: "sun",
+    icon: FiSun,
+  },
+  {
+    name: "target",
+    icon: FiTarget,
+  },
+  {
+    name: "tools",
+    icon: FiTool,
+  },
+  {
+    name: "unlock",
+    icon: FiUnlock,
+  },
+  {
+    name: "verifiedUser",
+    icon: FiUserCheck,
+  },
+  {
+    name: "wifi",
+    icon: FiWifi,
+  },
+  {
+    name: "lightning",
+    icon: FiZap,
+  },
+  {
+    name: "shipping",
+    icon: LiaShippingFastSolid,
+  },
+];
+
+interface trustStripItem {
+  _id: string;
+  icon: string;
+  title: string;
+  subtitle: string;
+}
 
 type TabId =
   | "general"
@@ -136,6 +405,13 @@ export default function WebsiteSettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [sliderImages, setSliderImages] = useState<File[]>([]);
   const [sliderPreview, setSliderPreview] = useState<string[]>([]);
+  const [stripTitle, setStripTitle] = useState("");
+  const [stripDescription, setStripDescription] = useState("");
+  const [selectedIcon, setSelectedIcon] = useState("");
+  const [openIconDialog, setOpenIconDialog] = useState(false);
+
+  const SelectedIcon =
+    TRUST_STRIP_ICONS[selectedIcon as keyof typeof TRUST_STRIP_ICONS];
 
   const handleBannerImageChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -316,9 +592,11 @@ export default function WebsiteSettingsPage() {
     enableNewsletter: false,
     newsletterTitle: "",
     newsletterText: "",
+    isTrustStripEnabled: false,
     theme: "teal-white",
     navbarLayout: "minimal",
     footerLayout: "multicolumn",
+    trustStrips: [] as trustStripItem[],
   });
 
   const checkDomain = async (slug: string) => {
@@ -533,6 +811,60 @@ export default function WebsiteSettingsPage() {
         console.log(validFiles);
         setIsLoading(false);
       }
+    }
+  };
+
+  const handleAddStripItem = async () => {
+    if (!stripTitle || !stripDescription || !selectedIcon) {
+      toast.error("Please Enter all the required fields");
+      return;
+    }
+    try {
+      setIsLoading(true);
+
+      const response = await axiosClient.post(API_ENDPOINTS.ADD_TRUST, {
+        tenantId,
+        selectedIcon,
+        stripDescription,
+        stripTitle,
+      });
+      console.log(response?.data);
+      if (response?.data?.success) {
+        toast.success(response?.data?.message);
+        setStripDescription("");
+        setStripTitle("");
+        setSelectedIcon("");
+        getWebSettings(tenantId);
+      }
+
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteStrip = async (stripId: string) => {
+    (console.log(stripId), "THIS IS THE STRIP ID");
+    try {
+      setIsLoading(true);
+      const response = await axiosClient.delete(API_ENDPOINTS.DELETE_TRUST, {
+        data: {
+          stripId,
+          tenantId,
+        },
+      });
+      if (response?.data?.success) {
+        getWebSettings(tenantId);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1201,6 +1533,233 @@ export default function WebsiteSettingsPage() {
                         </div>
                       )}
                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* trust strip  */}
+            <div>
+              <div className="flex items-center gap-2 text-gray-700 mb-6 pb-2 border-b border-gray-200">
+                <LiaHandshakeSolid className="w-5 h-5" />
+                <h2 className="text-base font-semibold">Trust Strip</h2>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                  Enable Trust Strip
+                </span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.isTrustStripEnabled}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        isTrustStripEnabled: e.target.checked,
+                      })
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
+                </label>
+              </div>
+
+              {settings?.isTrustStripEnabled &&
+                settings?.trustStrips?.length > 0 && (
+                  <div className="my-2">
+                    {settings?.trustStrips?.map((item, index) => {
+                      const SelectedIconComponent =
+                        TRUST_STRIP_ICONS[
+                          item.icon as keyof typeof TRUST_STRIP_ICONS
+                        ];
+
+                      return (
+                        <div
+                          key={index}
+                          className="flex cursor-pointer items-center gap-4  py-8 transition hover:bg-neutral-50 px-2 rounded"
+                        >
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+                            <SelectedIconComponent className="h-5 w-5 text-neutral-700" />
+                          </div>
+
+                          <div className="flex items-start justify-between w-full">
+                            <div>
+                              <h3 className="text-sm font-semibold tracking-wide text-neutral-900">
+                                {item.title}
+                              </h3>
+
+                              <p className="mt-1 text-sm text-neutral-500">
+                                {item.subtitle}
+                              </p>
+                            </div>
+                            <div className="flex items-center justify-center gap-3 ">
+                              <div className="border rounded-2xl bg-gray-100 p-3 hover:bg-gray-200">
+                                <CiEdit className="size-4 text-gray-500" />
+                              </div>
+                              <div
+                                className="border rounded-2xl bg-red-100 p-3 hover:bg-red-200"
+                                onClick={() => {
+                                  deleteStrip(item?._id);
+                                }}
+                              >
+                                <AiOutlineDelete className="size-4 text-red-500" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+              {settings?.isTrustStripEnabled && (
+                <div className="my-4">
+                  {settings?.trustStrips?.length < 4 && (
+                    <div>
+                      <div className="flex items-start flex-col mb-3">
+                        <label
+                          htmlFor="icon"
+                          className="text-xs font-bold uppercase tracking-wider text-gray-500"
+                        >
+                          Icon
+                        </label>
+                        {selectedIcon && (
+                          <div className="my-2 p-2 border border-gray-200 bg-gray-300 rounded-full">
+                            <SelectedIcon className="size-6" />
+                          </div>
+                        )}
+
+                        <div
+                          className=" my-2 bg-gray-300 p-2 rounded mb-3 cursor-pointer hover:bg-gray-200 transition-all duration-300 border border-gray-300"
+                          onClick={() => setOpenIconDialog(true)}
+                        >
+                          <BiPlus />
+                        </div>
+
+                        <label
+                          htmlFor="title"
+                          className="text-xs font-bold uppercase tracking-wider text-gray-500"
+                        >
+                          Title
+                        </label>
+
+                        <input
+                          type="text"
+                          className="my-2 block border w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm p-3 focus:ring-1  focus:outline-none"
+                          value={stripTitle}
+                          onChange={(e) => setStripTitle(e.target.value)}
+                        />
+
+                        <label
+                          htmlFor="subtitle"
+                          className="text-xs font-bold uppercase tracking-wider text-gray-500"
+                        >
+                          Subtitle
+                        </label>
+
+                        <input
+                          type="text"
+                          className="my-2 block border w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm p-3 focus:ring-1  focus:outline-none"
+                          value={stripDescription}
+                          onChange={(e) => setStripDescription(e.target.value)}
+                        />
+                      </div>
+
+                      <div
+                        className="bg-teal-600 hover:bg-teal-700 px-4 py-2 transition-all duration-300 rounded mt-2 w-auto inline text-white cursor-pointer text-sm"
+                        onClick={() => {
+                          handleAddStripItem();
+                        }}
+                      >
+                        Add Strip Item
+                      </div>
+
+                      <Dialog
+                        open={openIconDialog}
+                        onOpenChange={setOpenIconDialog}
+                      >
+                        <DialogContent className="w-[95vw] max-w-7xl rounded-2xl border-none p-0 overflow-hidden">
+                          {/* Header */}
+                          <div className="border-b border-gray-100 px-5 py-4 sticky top-0 bg-white z-10">
+                            <DialogHeader>
+                              <DialogTitle className="text-lg font-semibold text-gray-900">
+                                Select Icon
+                              </DialogTitle>
+
+                              <p className="text-sm text-gray-500 mt-1">
+                                Choose an icon for your trust strip
+                              </p>
+                            </DialogHeader>
+                          </div>
+
+                          {/* Body */}
+                          <div className="max-h-[70vh] overflow-y-auto px-4 py-5 aspect-square">
+                            <div className="grid  grid-cols-3 sm:grid-cols-4 gap-3">
+                              {TRUST_STRIP_ICON_OPTIONS.map((item) => {
+                                const Icon = item.icon;
+
+                                const isSelected = selectedIcon === item.name;
+
+                                return (
+                                  <button
+                                    key={item.name}
+                                    onClick={() => {
+                                      setSelectedIcon(item.name);
+                                      setOpenIconDialog(false);
+                                    }}
+                                    className={`
+                group relative flex flex-col items-center justify-center
+                rounded-2xl border p-4 transition-all duration-200
+                active:scale-95 cursor-pointer
+                ${
+                  isSelected
+                    ? "border-teal-500 bg-teal-50 shadow-sm"
+                    : "border-gray-200 bg-white hover:border-teal-300 hover:bg-gray-50"
+                }
+              `}
+                                  >
+                                    {/* Icon */}
+                                    <div
+                                      className={`
+                  flex h-11 w-11 items-center justify-center rounded-full
+                  transition-all duration-200
+                  ${
+                    isSelected
+                      ? "bg-teal-100 text-teal-600"
+                      : "bg-gray-100 text-gray-600 group-hover:bg-teal-50 group-hover:text-teal-500"
+                  }
+                `}
+                                    >
+                                      <Icon className="size-5" />
+                                    </div>
+
+                                    {/* Label */}
+                                    <span
+                                      className={`
+                  mt-2 text-[11px] font-medium capitalize text-center break-words
+                  ${
+                    isSelected
+                      ? "text-teal-700"
+                      : "text-gray-500 group-hover:text-gray-700"
+                  }
+                `}
+                                    >
+                                      {item.name}
+                                    </span>
+
+                                    {/* Selected Badge */}
+                                    {isSelected && (
+                                      <div className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-teal-500" />
+                                    )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
